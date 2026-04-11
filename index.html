@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guard Scanner</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial; background: #1a1a2e; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+    h1 { color: white; font-size: 24px; margin: 15px 0 5px 0; }
+    p { color: #a0a0c0; font-size: 14px; margin-bottom: 20px; text-align: center; }
+    #video-container { width: 100%; max-width: 380px; position: relative; border-radius: 12px; overflow: hidden; background: #000; min-height: 200px; }
+    video { width: 100%; display: block; }
+    canvas { display: none; }
+    #scan-line { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #22c55e; animation: scan 2s linear infinite; }
+    @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+    #status { color: #a0a0c0; font-size: 13px; margin: 10px 0; text-align: center; }
+    #result { width: 100%; max-width: 380px; margin-top: 15px; border-radius: 12px; padding: 25px; text-align: center; display: none; }
+    .approved { background: #f0fff0; }
+    .expired { background: #fff0f0; }
+    .notfound { background: #fffbf0; }
+    .result-icon { font-size: 70px; }
+    .result-title { font-size: 24px; font-weight: bold; margin: 10px 0; }
+    .approved .result-title { color: #22c55e; }
+    .expired .result-title { color: #ef4444; }
+    .notfound .result-title { color: #f59e0b; }
+    .detail { background: rgba(0,0,0,0.06); border-radius: 8px; padding: 10px 14px; margin: 6px 0; text-align: left; }
+    .label { font-size: 11px; color: #888; text-transform: uppercase; }
+    .value { font-size: 15px; font-weight: bold; color: #333; }
+    .scan-again { background: #1a1a2e; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; cursor: pointer; width: 100%; margin-top: 15px; }
+  </style>
+</head>
+<body>
+  <h1>🔒 Guard Scanner</h1>
+  <p>Customer ka QR Code camera ke saamne rakho</p>
+  <div id="video-container">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="canvas"></canvas>
+    <div id="scan-line"></div>
+  </div>
+  <div id="status">Camera start ho rahi hai...</div>
+  <div id="result"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwElsRseY5ZMIC0tW7onYCOAJXIzC7govzTHWQ4LvK_6BIdhHUoogir0UJJRKZmFLFQmA/exec";
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const statusEl = document.getElementById('status');
+    const resultEl = document.getElementById('result');
+    let scanning = true;
+    let stream = null;
+
+    async function startCamera() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { facingMode: "environment" } 
+        });
+        video.srcObject = stream;
+        video.play();
+        statusEl.textContent = "✅ Camera ready - QR code dikhao";
+        requestAnimationFrame(scanFrame);
+      } catch(err) {
+        statusEl.textContent = "❌ Camera allow karo - browser me permission do";
+      }
+    }
+
+    function scanFrame() {
+      if (!scanning) return;
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+        if (code) {
+          scanning = false;
+          statusEl.textContent = "QR mila! Check ho raha hai...";
+          processQR(code.data);
+          return;
+        }
+      }
+      requestAnimationFrame(scanFrame);
+    }
+
+    function processQR(url) {
+      try {
+        const urlObj = new URL(url);
+        const token = urlObj.searchParams.get('token');
+        if (!token) {
+          showResult('notfound', '⚠️', 'Invalid QR Code', '', '', '');
+          return;
+        }
+        const scanUrl = SCRIPT_URL + '?action=scan&token=' + token;
+        fetch(scanUrl)
+          .then(r => r.text())
+          .then(html => {
+            if (html.includes('Entry Approved')) {
+              showResult('approved', '✅', 'Entry Approved!',
+                extract(html, 'Name'), extract(html, 'Email'), extract(html, 'Order ID'));
+            } else if (html.includes('Ticket Expired')) {
+              showResult('expired', '❌', 'Ticket Expired!',
+                extract(html, 'Name'), extract(html, 'Email'), extract(html, 'Order ID'));
+            } else {
+              showResult('notfound', '⚠️', 'Ticket Not Found', '', '', '');
+            }
+          });
+      } catch(e) {
+        showResult('notfound', '⚠️', 'Invalid QR Code', '', '', '');
+      }
+    }
+
+    function extract(html, label) {
+      const regex = new RegExp(label + '<\\/div><div class="value">([^<]+)<\\/div>');
+      const match = html.match(regex);
+      return match ? match[1] : '';
+    }
+
+    function showResult(type, icon, title, name, email, orderId) {
+      if (stream) stream.getTracks().forEach(t => t.stop());
+      resultEl.className = 'result ' + type;
+      resultEl.style.display = 'block';
+      resultEl.innerHTML = `
+        <div class="result-icon">${icon}</div>
+        <div class="result-title">${title}</div>
+        ${name ? `<div class="detail"><div class="label">Name</div><div class="value">${name}</div></div>` : ''}
+        ${email ? `<div class="detail"><div class="label">Email</div><div class="value">${email}</div></div>` : ''}
+        ${orderId ? `<div class="detail"><div class="label">Order ID</div><div class="value">${orderId}</div></div>` : ''}
+        <button class="scan-again" onclick="location.reload()">🔄 Next Ticket Scan Karo</button>
+      `;
+    }
+
+    startCamera();
+  </script>
+</body>
+</html>

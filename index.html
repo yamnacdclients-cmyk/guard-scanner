@@ -31,18 +31,18 @@
 </head>
 <body>
   <h1>🔒 Guard Scanner</h1>
-  <p>Customer ka QR Code camera ke saamne rakho</p>
+  <p>Point camera at customer's QR Code</p>
   <div id="video-container">
     <video id="video" autoplay playsinline muted></video>
     <canvas id="canvas"></canvas>
     <div id="scan-line"></div>
   </div>
-  <div id="status">Camera start ho rahi hai...</div>
+  <div id="status">Starting camera...</div>
   <div id="result"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqt3FxYff9DxwHWjlGxbN6babcKxhV4nSPjIoKcf0jmSB8Eb5PaXl_vXDEqtjys3QRxQ/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx6Md-GduEnUMbMyhklrAcJEkwlV227t5hiKY3O5qi7JtBpDyxNMIfC2OwY0c9vzlyN/exec";
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
@@ -58,10 +58,10 @@
         });
         video.srcObject = stream;
         video.play();
-        statusEl.textContent = "✅ Camera ready - QR code dikhao";
+        statusEl.textContent = "✅ Camera ready - Show QR code";
         requestAnimationFrame(scanFrame);
       } catch(err) {
-        statusEl.textContent = "❌ Camera allow karo - browser me permission do";
+        statusEl.textContent = "❌ Allow camera permission in browser settings";
       }
     }
 
@@ -75,7 +75,7 @@
         const code = jsQR(imageData.data, imageData.width, imageData.height);
         if (code) {
           scanning = false;
-          statusEl.textContent = "QR mila! Check ho raha hai...";
+          statusEl.textContent = "QR found! Checking...";
           processQR(code.data);
           return;
         }
@@ -126,7 +126,7 @@
         ${name ? `<div class="detail"><div class="label">Name</div><div class="value">${name}</div></div>` : ''}
         ${email ? `<div class="detail"><div class="label">Email</div><div class="value">${email}</div></div>` : ''}
         ${orderId ? `<div class="detail"><div class="label">Order ID</div><div class="value">${orderId}</div></div>` : ''}
-        <button class="scan-again" onclick="location.reload()">🔄 Next Ticket Scan Karo</button>
+        <button class="scan-again" onclick="location.reload()">🔄 Scan Next Ticket</button>
       `;
     }
 

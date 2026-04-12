@@ -5,231 +5,63 @@
   <title>Guard Scanner</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; 
-      background: #0f0f1a; 
-      min-height: 100vh; 
-      color: white;
-    }
-
-    /* Header */
-    .header {
-      background: linear-gradient(135deg, #1a1a2e, #16213e);
-      padding: 15px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #0f0f1a; min-height: 100vh; color: white; }
+    .header { background: linear-gradient(135deg, #1a1a2e, #16213e); padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); position: sticky; top: 0; z-index: 100; }
     .header-left { display: flex; align-items: center; gap: 10px; }
     .header-icon { font-size: 28px; }
     .header-title { font-size: 18px; font-weight: 700; }
     .header-sub { font-size: 11px; color: #a0a0c0; margin-top: 2px; }
-    .live-badge {
-      background: #22c55e;
-      color: white;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      animation: pulse 2s infinite;
-    }
+    .live-badge { background: #22c55e; color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 5px; animation: pulse 2s infinite; }
     .live-dot { width: 6px; height: 6px; background: white; border-radius: 50%; }
     @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
-
-    /* Stats Bar */
-    .stats-bar {
-      background: #16213e;
-      padding: 12px 20px;
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-    .stat-card {
-      background: rgba(255,255,255,0.05);
-      border-radius: 10px;
-      padding: 10px 15px;
-      min-width: 100px;
-      text-align: center;
-      flex-shrink: 0;
-    }
+    .stats-bar { background: #16213e; padding: 12px 20px; display: flex; gap: 10px; overflow-x: auto; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .stat-card { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 10px 15px; min-width: 100px; text-align: center; flex-shrink: 0; }
     .stat-number { font-size: 22px; font-weight: 700; }
     .stat-label { font-size: 10px; color: #a0a0c0; margin-top: 2px; text-transform: uppercase; }
     .stat-total .stat-number { color: #60a5fa; }
     .stat-active .stat-number { color: #22c55e; }
     .stat-expired .stat-number { color: #ef4444; }
-
-    /* Scanner Section */
     .scanner-section { padding: 20px; }
     .scanner-title { font-size: 14px; color: #a0a0c0; margin-bottom: 12px; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
-    
-    #video-container { 
-      width: 100%; 
-      max-width: 400px; 
-      margin: 0 auto;
-      position: relative; 
-      border-radius: 16px; 
-      overflow: hidden; 
-      background: #000;
-      border: 2px solid rgba(34, 197, 94, 0.3);
-      box-shadow: 0 0 30px rgba(34, 197, 94, 0.1);
-    }
+    #video-container { width: 100%; max-width: 400px; margin: 0 auto; position: relative; border-radius: 16px; overflow: hidden; background: #000; border: 2px solid rgba(34,197,94,0.3); box-shadow: 0 0 30px rgba(34,197,94,0.1); }
     video { width: 100%; display: block; min-height: 250px; }
     canvas { display: none; }
-    
-    .scan-overlay {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .scan-box {
-      width: 200px; height: 200px;
-      border: 2px solid #22c55e;
-      border-radius: 12px;
-      position: relative;
-      box-shadow: 0 0 0 1000px rgba(0,0,0,0.4);
-    }
-    .scan-box::before, .scan-box::after {
-      content: '';
-      position: absolute;
-      width: 20px; height: 20px;
-      border-color: #22c55e;
-      border-style: solid;
-    }
-    .scan-box::before { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
-    .scan-box::after { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
-    
-    #scan-line { 
-      position: absolute; 
-      left: 0; right: 0; 
-      height: 2px; 
-      background: linear-gradient(90deg, transparent, #22c55e, transparent);
-      animation: scanline 2s linear infinite; 
-    }
+    .scan-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+    .scan-box { width: 200px; height: 200px; border: 2px solid #22c55e; border-radius: 12px; position: relative; box-shadow: 0 0 0 1000px rgba(0,0,0,0.4); }
+    #scan-line { position: absolute; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #22c55e, transparent); animation: scanline 2s linear infinite; }
     @keyframes scanline { 0% { top: 10%; } 100% { top: 90%; } }
-
-    #status { 
-      text-align: center; 
-      padding: 10px; 
-      font-size: 13px; 
-      color: #a0a0c0;
-      margin-top: 10px;
-    }
-
-    /* Result Popup Overlay */
-    .popup-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.85);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      padding: 20px;
-    }
-    .popup-overlay.show { display: flex; }
-    
-    .popup-card {
-      background: white;
-      border-radius: 20px;
-      padding: 30px 25px;
-      width: 100%;
-      max-width: 380px;
-      text-align: center;
-      animation: popIn 0.3s ease;
-    }
+    #status { text-align: center; padding: 10px; font-size: 13px; color: #a0a0c0; margin-top: 10px; }
+    .popup-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+    .popup-overlay.show { display: flex !important; }
+    .popup-card { background: white; border-radius: 20px; padding: 30px 25px; width: 100%; max-width: 380px; text-align: center; animation: popIn 0.3s ease; }
     @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-    
     .popup-icon { font-size: 80px; margin-bottom: 10px; }
     .popup-title { font-size: 26px; font-weight: 700; margin-bottom: 15px; }
     .popup-approved .popup-title { color: #22c55e; }
     .popup-expired .popup-title { color: #ef4444; }
     .popup-notfound .popup-title { color: #f59e0b; }
-    
-    .popup-detail {
-      background: #f8f9fa;
-      border-radius: 10px;
-      padding: 10px 15px;
-      margin: 6px 0;
-      text-align: left;
-    }
+    .popup-detail { background: #f8f9fa; border-radius: 10px; padding: 10px 15px; margin: 6px 0; text-align: left; }
     .popup-label { font-size: 11px; color: #888; text-transform: uppercase; }
     .popup-value { font-size: 15px; font-weight: 600; color: #333; }
-    
-    .popup-badge {
-      display: inline-block;
-      padding: 6px 20px;
-      border-radius: 20px;
-      color: white;
-      font-weight: 600;
-      font-size: 14px;
-      margin: 12px 0;
-    }
+    .popup-badge { display: inline-block; padding: 6px 20px; border-radius: 20px; color: white; font-weight: 600; font-size: 14px; margin: 12px 0; }
     .popup-approved .popup-badge { background: #22c55e; }
     .popup-expired .popup-badge { background: #ef4444; }
     .popup-notfound .popup-badge { background: #f59e0b; }
-    
-    .next-btn {
-      background: #1a1a2e;
-      color: white;
-      border: none;
-      padding: 14px;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 10px;
-    }
-
-    /* Recent Scans */
+    .next-btn { background: #1a1a2e; color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 10px; }
     .recent-section { padding: 0 20px 20px; }
-    .recent-title { 
-      font-size: 14px; 
-      color: #a0a0c0; 
-      text-transform: uppercase; 
-      letter-spacing: 1px; 
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .recent-title { font-size: 14px; color: #a0a0c0; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
     .recent-list { display: flex; flex-direction: column; gap: 8px; }
-    .recent-item {
-      background: rgba(255,255,255,0.05);
-      border-radius: 10px;
-      padding: 12px 15px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    .recent-item { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; }
     .recent-name { font-size: 14px; font-weight: 600; }
     .recent-email { font-size: 11px; color: #a0a0c0; margin-top: 2px; }
-    .status-badge {
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-    }
+    .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
     .badge-active { background: rgba(34,197,94,0.2); color: #22c55e; }
     .badge-expired { background: rgba(239,68,68,0.2); color: #ef4444; }
-    
     .empty-state { text-align: center; color: #a0a0c0; padding: 20px; font-size: 13px; }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
   <div class="header">
     <div class="header-left">
       <div class="header-icon">🔒</div>
@@ -238,29 +70,24 @@
         <div class="header-sub">Event Entry Management</div>
       </div>
     </div>
-    <div class="live-badge">
-      <div class="live-dot"></div>
-      LIVE
-    </div>
+    <div class="live-badge"><div class="live-dot"></div>LIVE</div>
   </div>
 
-  <!-- Stats Bar -->
   <div class="stats-bar">
     <div class="stat-card stat-total">
-      <div class="stat-number" id="total-count">-</div>
+      <div class="stat-number" id="total-count">0</div>
       <div class="stat-label">Total Tickets</div>
     </div>
     <div class="stat-card stat-active">
-      <div class="stat-number" id="active-count">-</div>
+      <div class="stat-number" id="active-count">0</div>
       <div class="stat-label">Remaining</div>
     </div>
     <div class="stat-card stat-expired">
-      <div class="stat-number" id="expired-count">-</div>
+      <div class="stat-number" id="expired-count">0</div>
       <div class="stat-label">Checked In</div>
     </div>
   </div>
 
-  <!-- Scanner -->
   <div class="scanner-section">
     <div class="scanner-title">Point camera at customer QR code</div>
     <div id="video-container">
@@ -275,27 +102,21 @@
     <div id="status">Starting camera...</div>
   </div>
 
-  <!-- Recent Scans -->
   <div class="recent-section">
-    <div class="recent-title">
-      📋 All Tickets
-    </div>
+    <div class="recent-title">📋 All Tickets</div>
     <div class="recent-list" id="recent-list">
       <div class="empty-state">Loading tickets...</div>
     </div>
   </div>
 
-  <!-- Result Popup -->
   <div class="popup-overlay" id="popup-overlay">
-    <div class="popup-card" id="popup-card">
-    </div>
+    <div class="popup-card" id="popup-card"></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby4sP4saikTB4XkYKiFjlQfC2loLcamKIXdZ0EEg1wpXwBoRTrx7otFTGJpiW6wSSj1Jw/exec";
-    const SHEET_ID = "";
-    
+
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
@@ -303,15 +124,14 @@
     let scanning = true;
     let stream = null;
 
-    // Camera Start
     async function startCamera() {
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ 
-          video: { facingMode: "environment" } 
-        });
+        if (stream) { stream.getTracks().forEach(t => t.stop()); }
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
         video.srcObject = stream;
-        video.play();
+        await video.play();
         statusEl.textContent = "✅ Ready - Show customer QR code";
+        scanning = true;
         requestAnimationFrame(scanFrame);
       } catch(err) {
         statusEl.textContent = "❌ Allow camera permission in browser settings";
@@ -330,6 +150,7 @@
           scanning = false;
           statusEl.textContent = "QR found! Checking...";
           processQR(code.data);
+          return;
         }
       }
       requestAnimationFrame(scanFrame);
@@ -340,22 +161,20 @@
         const urlObj = new URL(url);
         const token = urlObj.searchParams.get('token');
         if (!token) { showPopup('notfound', '⚠️', 'Invalid QR Code', '', '', ''); return; }
-        
-        const scanUrl = SCRIPT_URL + '?action=scan&token=' + token;
-        fetch(scanUrl)
+        const scanUrl = SCRIPT_URL + '?action=scan&token=' + encodeURIComponent(token);
+        fetch(scanUrl, { mode: 'cors' })
           .then(r => r.text())
           .then(html => {
             if (html.includes('Entry Approved')) {
-              showPopup('approved', '✅', 'Entry Approved!',
-                extract(html, 'Name'), extract(html, 'Email'), extract(html, 'Order ID'));
+              showPopup('approved', '✅', 'Entry Approved!', extract(html, 'Name'), extract(html, 'Email'), extract(html, 'Order ID'));
             } else if (html.includes('Ticket Expired')) {
-              showPopup('expired', '❌', 'Ticket Expired!',
-                extract(html, 'Name'), extract(html, 'Email'), extract(html, 'Order ID'));
+              showPopup('expired', '❌', 'Ticket Expired!', extract(html, 'Name'), extract(html, 'Email'), extract(html, 'Order ID'));
             } else {
               showPopup('notfound', '⚠️', 'Ticket Not Found', '', '', '');
             }
             loadStats();
-          });
+          })
+          .catch(() => showPopup('notfound', '⚠️', 'Connection Error', '', '', ''));
       } catch(e) {
         showPopup('notfound', '⚠️', 'Invalid QR Code', '', '', '');
       }
@@ -369,17 +188,16 @@
 
     function showPopup(type, icon, title, name, email, orderId) {
       if (stream) stream.getTracks().forEach(t => t.stop());
-      
       const badge = type === 'approved' ? '✓ CHECKED IN' : type === 'expired' ? '✗ ALREADY USED' : '⚠ NOT FOUND';
-      
-      document.getElementById('popup-card').className = 'popup-card popup-' + type;
-      document.getElementById('popup-card').innerHTML = `
+      const card = document.getElementById('popup-card');
+      card.className = 'popup-card popup-' + type;
+      card.innerHTML = `
         <div class="popup-icon">${icon}</div>
         <div class="popup-title">${title}</div>
         ${name ? `<div class="popup-detail"><div class="popup-label">Name</div><div class="popup-value">${name}</div></div>` : ''}
         ${email ? `<div class="popup-detail"><div class="popup-label">Email</div><div class="popup-value">${email}</div></div>` : ''}
         ${orderId ? `<div class="popup-detail"><div class="popup-label">Order ID</div><div class="popup-value">${orderId}</div></div>` : ''}
-        <div class="popup-badge">${badge}</div>
+        <div class="popup-badge">${badge}</div><br>
         <button class="next-btn" onclick="nextScan()">🔄 Scan Next Ticket</button>
       `;
       document.getElementById('popup-overlay').classList.add('show');
@@ -387,42 +205,36 @@
 
     function nextScan() {
       document.getElementById('popup-overlay').classList.remove('show');
-      scanning = true;
       startCamera();
     }
 
-    // Live Stats from Google Sheet
     function loadStats() {
-      fetch(SCRIPT_URL + '?action=stats')
-        .then(r => r.text())
-        .then(html => {
-          try {
-            const data = JSON.parse(html);
-            document.getElementById('total-count').textContent = data.total || 0;
-            document.getElementById('active-count').textContent = data.active || 0;
-            document.getElementById('expired-count').textContent = data.expired || 0;
-            
-            const list = document.getElementById('recent-list');
-            if (data.tickets && data.tickets.length > 0) {
-              list.innerHTML = data.tickets.map(t => `
-                <div class="recent-item">
-                  <div>
-                    <div class="recent-name">${t.name || 'Unknown'}</div>
-                    <div class="recent-email">${t.email || ''}</div>
-                  </div>
-                  <div class="status-badge ${t.status === 'Active' ? 'badge-active' : 'badge-expired'}">
-                    ${t.status === 'Active' ? '✅ Active' : '❌ Used'}
-                  </div>
+      fetch(SCRIPT_URL + '?action=stats', { mode: 'cors' })
+        .then(r => r.json())
+        .then(data => {
+          document.getElementById('total-count').textContent = data.total || 0;
+          document.getElementById('active-count').textContent = data.active || 0;
+          document.getElementById('expired-count').textContent = data.expired || 0;
+          const list = document.getElementById('recent-list');
+          if (data.tickets && data.tickets.length > 0) {
+            list.innerHTML = data.tickets.map(t => `
+              <div class="recent-item">
+                <div>
+                  <div class="recent-name">${t.name || 'Unknown'}</div>
+                  <div class="recent-email">${t.email || ''}</div>
                 </div>
-              `).join('');
-            } else {
-              list.innerHTML = '<div class="empty-state">No tickets yet</div>';
-            }
-          } catch(e) {}
-        }).catch(() => {});
+                <div class="status-badge ${t.status === 'Active' ? 'badge-active' : 'badge-expired'}">
+                  ${t.status === 'Active' ? '✅ Active' : '❌ Used'}
+                </div>
+              </div>
+            `).join('');
+          } else {
+            list.innerHTML = '<div class="empty-state">No tickets yet</div>';
+          }
+        })
+        .catch(() => {});
     }
 
-    // Auto refresh every 1 second
     setInterval(loadStats, 1000);
     loadStats();
     startCamera();

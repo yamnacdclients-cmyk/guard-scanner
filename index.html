@@ -7,11 +7,11 @@
   <title>Komrad Guard Scanner</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    html, body { width: 100%; overflow-x: hidden; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #0a0a0a; min-height: 100vh; color: white; font-size: 14px; }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #0a0a0a; color: white; font-size: 14px; display: flex; flex-direction: column; }
 
     /* Login Screen */
-    .login-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; background: #0a0a0a; }
+    .login-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; background: #0a0a0a; z-index: 1000; overflow-y: auto; }
     .login-logo img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 12px; filter: drop-shadow(0 0 15px rgba(245,197,24,0.3)); }
     .login-brand { font-size: 24px; font-weight: 900; color: #f5c518; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 4px; }
     .login-sub { font-size: 10px; color: #666; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 30px; }
@@ -27,31 +27,34 @@
     .login-error { color: #ef4444; text-align: center; font-size: 12px; margin-top: 10px; display: none; background: rgba(239,68,68,0.1); padding: 8px; border-radius: 8px; }
 
     /* Main App */
-    .main-app { display: none; width: 100%; }
+    .main-app { display: none; flex-direction: column; height: 100%; overflow: hidden; }
 
-    /* Header */
-    .header { background: #0a0a0a; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(245,197,24,0.15); position: sticky; top: 0; z-index: 100; }
+    /* Header - Fixed */
+    .header { background: #0a0a0a; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(245,197,24,0.15); flex-shrink: 0; }
     .header-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
     .header-logo img { width: 34px; height: 34px; object-fit: contain; flex-shrink: 0; }
     .header-text { min-width: 0; }
     .header-title { font-size: 14px; font-weight: 800; color: #f5c518; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
-    .header-sub { font-size: 9px; color: #666; letter-spacing: 1px; white-space: nowrap; }
+    .header-sub { font-size: 9px; color: #666; letter-spacing: 1px; }
     .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; margin-left: 8px; }
-    .live-badge { background: #f5c518; color: #0a0a0a; padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 800; display: flex; align-items: center; gap: 3px; letter-spacing: 1px; white-space: nowrap; }
-    .live-dot { width: 5px; height: 5px; background: #0a0a0a; border-radius: 50%; animation: blink 1.5s infinite; flex-shrink: 0; }
+    .live-badge { background: #f5c518; color: #0a0a0a; padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 800; display: flex; align-items: center; gap: 3px; white-space: nowrap; }
+    .live-dot { width: 5px; height: 5px; background: #0a0a0a; border-radius: 50%; animation: blink 1.5s infinite; }
     @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
-    .session-info { font-size: 9px; color: #666; text-align: right; white-space: nowrap; }
+    .session-info { font-size: 9px; color: #666; white-space: nowrap; }
     .session-info span { color: #f5c518; }
 
-    /* Stats Bar */
-    .stats-bar { background: #0d0d0d; padding: 10px 12px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; border-bottom: 1px solid rgba(245,197,24,0.08); }
-    .stat-card { background: #111; border: 1px solid rgba(245,197,24,0.08); border-radius: 10px; padding: 8px 6px; text-align: center; }
+    /* Stats - Fixed */
+    .stats-bar { background: #0d0d0d; padding: 8px 12px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; border-bottom: 1px solid rgba(245,197,24,0.08); flex-shrink: 0; }
+    .stat-card { background: #111; border: 1px solid rgba(245,197,24,0.08); border-radius: 10px; padding: 8px 4px; text-align: center; }
     .stat-number { font-size: 20px; font-weight: 900; line-height: 1.1; }
     .stat-label { font-size: 8px; color: #666; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
     .stat-total .stat-number { color: #f5c518; }
     .stat-active .stat-number { color: #22c55e; }
     .stat-expired .stat-number { color: #ef4444; }
     .stat-time .stat-number { font-size: 11px; color: #888; line-height: 1.4; }
+
+    /* Scrollable Content */
+    .scroll-content { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
 
     /* Ready Screen */
     .scanner-ready { padding: 20px 16px; display: flex; flex-direction: column; align-items: center; }
@@ -62,14 +65,15 @@
     .scan-btn { background: #f5c518; color: #0a0a0a; border: none; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 900; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 2px; }
     .scan-btn:active { background: #d4a800; transform: scale(0.98); }
 
-    /* Scanner */
-    .scanner-section { padding: 16px; display: none; }
+    /* Scanner Screen - Fixed camera, scroll below */
+    .scanner-screen { display: none; flex-direction: column; height: 100%; overflow: hidden; }
+    .scanner-fixed { flex-shrink: 0; padding: 12px 16px 8px; }
     .scanner-title { font-size: 10px; color: #666; margin-bottom: 10px; text-align: center; text-transform: uppercase; letter-spacing: 2px; }
     #video-container { width: 100%; position: relative; border-radius: 14px; overflow: hidden; background: #000; border: 2px solid rgba(245,197,24,0.3); }
-    video { width: 100%; display: block; max-height: 55vw; object-fit: cover; min-height: 220px; }
+    video { width: 100%; display: block; height: 52vw; max-height: 260px; object-fit: cover; }
     canvas { display: none; }
     .scan-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
-    .scan-box { width: 160px; height: 160px; position: relative; box-shadow: 0 0 0 1000px rgba(0,0,0,0.5); }
+    .scan-box { width: 150px; height: 150px; position: relative; box-shadow: 0 0 0 1000px rgba(0,0,0,0.5); }
     .corner { position: absolute; width: 18px; height: 18px; border-color: #f5c518; border-style: solid; }
     .corner-tl { top: 0; left: 0; border-width: 3px 0 0 3px; border-radius: 3px 0 0 0; }
     .corner-tr { top: 0; right: 0; border-width: 3px 3px 0 0; border-radius: 0 3px 0 0; }
@@ -77,8 +81,33 @@
     .corner-br { bottom: 0; right: 0; border-width: 0 3px 3px 0; border-radius: 0 0 3px 0; }
     #scan-line { position: absolute; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #f5c518, transparent); animation: scanline 2s linear infinite; }
     @keyframes scanline { 0% { top: 5%; } 100% { top: 95%; } }
-    #status { text-align: center; padding: 10px; font-size: 12px; color: #888; }
-    .stop-btn { background: #1a1a1a; color: #ef4444; border: 1px solid rgba(239,68,68,0.3); padding: 11px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; }
+    #status { text-align: center; padding: 8px; font-size: 12px; color: #888; }
+    .stop-btn { background: #1a1a1a; color: #ef4444; border: 1px solid rgba(239,68,68,0.3); padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 1px; margin-top: 6px; }
+    .scanner-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+    /* Tabs */
+    .tabs-container { padding: 12px 14px 0; flex-shrink: 0; }
+    .tabs { display: flex; gap: 6px; background: #111; border-radius: 12px; padding: 4px; }
+    .tab { flex: 1; padding: 8px 4px; border-radius: 9px; font-size: 11px; font-weight: 700; text-align: center; cursor: pointer; transition: all 0.2s; color: #666; user-select: none; }
+    .tab.active { background: #f5c518; color: #0a0a0a; }
+    .tab-count { font-size: 14px; font-weight: 900; display: block; line-height: 1.2; }
+    .tab-label { font-size: 9px; letter-spacing: 0.5px; text-transform: uppercase; }
+
+    /* Ticket List */
+    .tickets-list { padding: 10px 14px 20px; }
+    .ticket-item { background: #111; border: 1px solid rgba(255,255,255,0.04); border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+    .ticket-info { min-width: 0; flex: 1; }
+    .ticket-name { font-size: 13px; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ticket-email { font-size: 10px; color: #666; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .status-badge { padding: 4px 9px; border-radius: 20px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; white-space: nowrap; }
+    .badge-active { background: rgba(34,197,94,0.12); color: #22c55e; border: 1px solid rgba(34,197,94,0.25); }
+    .badge-expired { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.25); }
+    .empty-state { text-align: center; color: #555; padding: 30px; font-size: 12px; }
+
+    /* Footer */
+    .footer { text-align: center; padding: 14px; border-top: 1px solid rgba(255,255,255,0.04); flex-shrink: 0; }
+    .footer p { font-size: 10px; color: #444; letter-spacing: 0.5px; }
+    .footer span { color: #f5c518; }
 
     /* Popup */
     .popup-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.93); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 16px; }
@@ -102,24 +131,6 @@
     .popup-notfound .popup-badge { background: #f5c518; color: #0a0a0a; }
     .next-btn { background: #f5c518; color: #0a0a0a; border: none; padding: 15px; border-radius: 12px; font-size: 14px; font-weight: 900; cursor: pointer; width: 100%; margin-top: 10px; text-transform: uppercase; letter-spacing: 1px; }
     .next-btn:active { background: #d4a800; }
-
-    /* Tickets */
-    .recent-section { padding: 0 14px 20px; }
-    .recent-title { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
-    .recent-list { display: flex; flex-direction: column; gap: 6px; }
-    .recent-item { background: #111; border: 1px solid rgba(255,255,255,0.04); border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .recent-info { min-width: 0; flex: 1; }
-    .recent-name { font-size: 13px; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .recent-email { font-size: 10px; color: #666; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .status-badge { padding: 4px 9px; border-radius: 20px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; white-space: nowrap; }
-    .badge-active { background: rgba(34,197,94,0.12); color: #22c55e; border: 1px solid rgba(34,197,94,0.25); }
-    .badge-expired { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.25); }
-    .empty-state { text-align: center; color: #555; padding: 20px; font-size: 12px; }
-
-    /* Footer */
-    .footer { text-align: center; padding: 16px 14px 28px; border-top: 1px solid rgba(255,255,255,0.04); }
-    .footer p { font-size: 10px; color: #444; letter-spacing: 0.5px; }
-    .footer span { color: #f5c518; }
   </style>
 </head>
 <body>
@@ -154,6 +165,8 @@
 
   <!-- Main App -->
   <div class="main-app" id="main-app">
+
+    <!-- Fixed Header -->
     <div class="header">
       <div class="header-left">
         <div class="header-logo">
@@ -170,6 +183,7 @@
       </div>
     </div>
 
+    <!-- Fixed Stats -->
     <div class="stats-bar">
       <div class="stat-card stat-total">
         <div class="stat-number" id="total-count">0</div>
@@ -177,11 +191,11 @@
       </div>
       <div class="stat-card stat-active">
         <div class="stat-number" id="active-count">0</div>
-        <div class="stat-label">Left</div>
+        <div class="stat-label">Active</div>
       </div>
       <div class="stat-card stat-expired">
         <div class="stat-number" id="expired-count">0</div>
-        <div class="stat-label">In</div>
+        <div class="stat-label">Used</div>
       </div>
       <div class="stat-card stat-time">
         <div class="stat-number" id="local-time">--:--</div>
@@ -189,46 +203,95 @@
       </div>
     </div>
 
-    <div class="scanner-ready" id="scanner-ready">
-      <div class="ready-card">
-        <div class="ready-icon">🎟️</div>
-        <div class="ready-title">Ready to Scan</div>
-        <div class="ready-sub">Tap the button below to activate camera and start scanning tickets</div>
-        <button class="scan-btn" onclick="activateScanner()">📷 Start Scanning</button>
-      </div>
-    </div>
+    <!-- Scrollable Content — Dashboard -->
+    <div class="scroll-content" id="dashboard-screen">
 
-    <div class="scanner-section" id="scanner-section">
-      <div class="scanner-title">Point camera at customer QR code</div>
-      <div id="video-container">
-        <video id="video" autoplay playsinline muted></video>
-        <canvas id="canvas"></canvas>
-        <div class="scan-overlay">
-          <div class="scan-box">
-            <div class="corner corner-tl"></div>
-            <div class="corner corner-tr"></div>
-            <div class="corner corner-bl"></div>
-            <div class="corner corner-br"></div>
-            <div id="scan-line"></div>
+      <!-- Ready to Scan -->
+      <div class="scanner-ready" id="scanner-ready">
+        <div class="ready-card">
+          <div class="ready-icon">🎟️</div>
+          <div class="ready-title">Ready to Scan</div>
+          <div class="ready-sub">Tap the button below to activate camera and start scanning tickets</div>
+          <button class="scan-btn" onclick="activateScanner()">📷 Start Scanning</button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs-container">
+        <div class="tabs">
+          <div class="tab active" id="tab-all" onclick="switchTab('all')">
+            <span class="tab-count" id="tab-all-count">0</span>
+            <span class="tab-label">All</span>
+          </div>
+          <div class="tab" id="tab-active" onclick="switchTab('active')">
+            <span class="tab-count" id="tab-active-count">0</span>
+            <span class="tab-label">Active</span>
+          </div>
+          <div class="tab" id="tab-used" onclick="switchTab('used')">
+            <span class="tab-count" id="tab-used-count">0</span>
+            <span class="tab-label">Used</span>
           </div>
         </div>
       </div>
-      <div id="status">Initializing camera...</div>
-      <button class="stop-btn" onclick="deactivateScanner()">✕ Stop Scanner</button>
-    </div>
 
-    <div class="recent-section">
-      <div class="recent-title">📋 All Tickets</div>
-      <div class="recent-list" id="recent-list">
-        <div class="empty-state">No tickets yet</div>
+      <div class="tickets-list" id="tickets-list"></div>
+
+      <div class="footer">
+        <p>© 2026 <span>Komrad Promotions</span> · Powered by <span>Carpediem</span></p>
       </div>
     </div>
 
-    <div class="footer">
-      <p>© 2026 <span>komradpromotions.com</span> · Powered by <span>Carpediem</span></p>
+    <!-- Scanner Screen -->
+    <div class="scanner-screen" id="scanner-screen">
+
+      <!-- Fixed Camera -->
+      <div class="scanner-fixed">
+        <div class="scanner-title">Point camera at customer QR code</div>
+        <div id="video-container">
+          <video id="video" autoplay playsinline muted></video>
+          <canvas id="canvas"></canvas>
+          <div class="scan-overlay">
+            <div class="scan-box">
+              <div class="corner corner-tl"></div>
+              <div class="corner corner-tr"></div>
+              <div class="corner corner-bl"></div>
+              <div class="corner corner-br"></div>
+              <div id="scan-line"></div>
+            </div>
+          </div>
+        </div>
+        <div id="status">Initializing camera...</div>
+        <button class="stop-btn" onclick="deactivateScanner()">✕ Stop Scanner</button>
+      </div>
+
+      <!-- Scrollable Tickets Below Camera -->
+      <div class="scanner-scroll">
+        <div class="tabs-container">
+          <div class="tabs">
+            <div class="tab active" id="stab-all" onclick="switchTab('all', true)">
+              <span class="tab-count" id="stab-all-count">0</span>
+              <span class="tab-label">All</span>
+            </div>
+            <div class="tab" id="stab-active" onclick="switchTab('active', true)">
+              <span class="tab-count" id="stab-active-count">0</span>
+              <span class="tab-label">Active</span>
+            </div>
+            <div class="tab" id="stab-used" onclick="switchTab('used', true)">
+              <span class="tab-count" id="stab-used-count">0</span>
+              <span class="tab-label">Used</span>
+            </div>
+          </div>
+        </div>
+        <div class="tickets-list" id="scanner-tickets-list"></div>
+        <div class="footer">
+          <p>© 2026 <span>Komrad Promotions</span> · Powered by <span>Carpediem</span></p>
+        </div>
+      </div>
     </div>
+
   </div>
 
+  <!-- Popup -->
   <div class="popup-overlay" id="popup-overlay">
     <div class="popup-card" id="popup-card"></div>
   </div>
@@ -241,31 +304,31 @@
 
     let currentPin = "";
     let sessionEndTime = null;
-    let sessionInterval = null;
+    let allTickets = [];
+    let currentTab = 'all';
+    let scannerActive = false;
 
+    // PIN
     function addPin(num) {
       if (currentPin.length >= 9) return;
       currentPin += num;
       updatePinDisplay();
     }
-
     function clearPin() {
       currentPin = currentPin.slice(0, -1);
       updatePinDisplay();
     }
-
     function updatePinDisplay() {
       const d = document.getElementById('pin-display');
       d.textContent = currentPin.length > 0 ? '●'.repeat(currentPin.length) : '— — — — —';
     }
-
     function checkPin() {
       if (VALID_PINS.includes(currentPin)) {
         document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-app').style.display = 'block';
+        document.getElementById('main-app').style.display = 'flex';
         startSession();
         loadStats();
-        setInterval(loadStats, 1000);
+        setInterval(loadStats, 2000);
         setInterval(updateLocalTime, 1000);
         updateLocalTime();
       } else {
@@ -276,16 +339,15 @@
       }
     }
 
+    // Session
     function startSession() {
       sessionEndTime = Date.now() + SESSION_HOURS * 3600000;
-      sessionInterval = setInterval(updateSessionTimer, 1000);
+      setInterval(updateSessionTimer, 1000);
       updateSessionTimer();
     }
-
     function updateSessionTimer() {
       const rem = sessionEndTime - Date.now();
       if (rem <= 0) {
-        clearInterval(sessionInterval);
         if (stream) stream.getTracks().forEach(t => t.stop());
         document.getElementById('main-app').style.display = 'none';
         document.getElementById('login-screen').style.display = 'flex';
@@ -299,14 +361,45 @@
       const s = Math.floor((rem % 60000) / 1000);
       document.getElementById('time-left').textContent = h + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
     }
-
     function updateLocalTime() {
       const now = new Date();
-      document.getElementById('local-time').textContent = now.toLocaleTimeString('en-US', {
-        hour: '2-digit', minute: '2-digit', hour12: true
-      });
+      document.getElementById('local-time').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
     }
 
+    // Tabs
+    function switchTab(tab, inScanner) {
+      currentTab = tab;
+      const prefix = inScanner ? 'stab' : 'tab';
+      ['all','active','used'].forEach(t => {
+        const el = document.getElementById(prefix + '-' + t);
+        if (el) el.classList.toggle('active', t === tab);
+      });
+      renderTickets(inScanner);
+    }
+
+    function renderTickets(inScanner) {
+      let filtered = allTickets;
+      if (currentTab === 'active') filtered = allTickets.filter(t => t.status === 'Active');
+      if (currentTab === 'used') filtered = allTickets.filter(t => t.status !== 'Active');
+
+      const html = filtered.length > 0 ? filtered.map(t => `
+        <div class="ticket-item">
+          <div class="ticket-info">
+            <div class="ticket-name">${t.name || 'Unknown'}</div>
+            <div class="ticket-email">${t.email || ''}</div>
+          </div>
+          <div class="status-badge ${t.status === 'Active' ? 'badge-active' : 'badge-expired'}">
+            ${t.status === 'Active' ? '✅ Active' : '❌ Used'}
+          </div>
+        </div>
+      `).join('') : '<div class="empty-state">No tickets found</div>';
+
+      const listId = inScanner ? 'scanner-tickets-list' : 'tickets-list';
+      const el = document.getElementById(listId);
+      if (el) el.innerHTML = html;
+    }
+
+    // Scanner
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
@@ -315,18 +408,18 @@
     let stream = null;
 
     function activateScanner() {
-      document.getElementById('scanner-ready').style.display = 'none';
-      document.getElementById('scanner-section').style.display = 'block';
+      scannerActive = true;
+      document.getElementById('dashboard-screen').style.display = 'none';
+      document.getElementById('scanner-screen').style.display = 'flex';
       startCamera();
     }
-
     function deactivateScanner() {
+      scannerActive = false;
       if (stream) stream.getTracks().forEach(t => t.stop());
       scanning = false;
-      document.getElementById('scanner-section').style.display = 'none';
-      document.getElementById('scanner-ready').style.display = 'flex';
+      document.getElementById('scanner-screen').style.display = 'none';
+      document.getElementById('dashboard-screen').style.display = 'block';
     }
-
     async function startCamera() {
       try {
         if (stream) stream.getTracks().forEach(t => t.stop());
@@ -340,7 +433,6 @@
         statusEl.textContent = "❌ Allow camera permission in browser settings";
       }
     }
-
     function scanFrame() {
       if (!scanning) return;
       if (video.readyState === video.HAVE_ENOUGH_DATA) {
@@ -358,7 +450,6 @@
       }
       requestAnimationFrame(scanFrame);
     }
-
     function processQR(url) {
       try {
         const urlObj = new URL(url);
@@ -401,29 +492,31 @@
       startCamera();
     }
 
+    // Stats
     function loadStats() {
       fetch(SCRIPT_URL + '?action=stats')
         .then(r => r.json())
         .then(data => {
-          document.getElementById('total-count').textContent = data.total || 0;
-          document.getElementById('active-count').textContent = data.active || 0;
-          document.getElementById('expired-count').textContent = data.expired || 0;
-          const list = document.getElementById('recent-list');
-          if (data.tickets && data.tickets.length > 0) {
-            list.innerHTML = data.tickets.map(t => `
-              <div class="recent-item">
-                <div class="recent-info">
-                  <div class="recent-name">${t.name || 'Unknown'}</div>
-                  <div class="recent-email">${t.email || ''}</div>
-                </div>
-                <div class="status-badge ${t.status === 'Active' ? 'badge-active' : 'badge-expired'}">
-                  ${t.status === 'Active' ? '✅ Active' : '❌ Used'}
-                </div>
-              </div>
-            `).join('');
-          } else {
-            list.innerHTML = '<div class="empty-state">No tickets yet</div>';
-          }
+          const total = data.total || 0;
+          const active = data.active || 0;
+          const expired = data.expired || 0;
+          allTickets = data.tickets || [];
+
+          document.getElementById('total-count').textContent = total;
+          document.getElementById('active-count').textContent = active;
+          document.getElementById('expired-count').textContent = expired;
+
+          // Tab counts
+          ['tab','stab'].forEach(p => {
+            const a = document.getElementById(p + '-all-count');
+            const ac = document.getElementById(p + '-active-count');
+            const u = document.getElementById(p + '-used-count');
+            if (a) a.textContent = total;
+            if (ac) ac.textContent = active;
+            if (u) u.textContent = expired;
+          });
+
+          renderTickets(scannerActive);
         }).catch(() => {});
     }
   </script>

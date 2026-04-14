@@ -99,6 +99,12 @@
     .ticket-info { min-width: 0; flex: 1; }
     .ticket-name { font-size: 13px; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .ticket-email { font-size: 10px; color: #666; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* UPDATE 1 — ticket-date + search styles */
+    .ticket-date { font-size: 9px; color: #555; margin-top: 2px; }
+    .search-container { padding: 10px 14px 0; }
+    .search-bar { width: 100%; background: #111; border: 1px solid rgba(245,197,24,0.2); border-radius: 12px; padding: 10px 14px; font-size: 13px; color: white; outline: none; }
+    .search-bar::placeholder { color: #555; }
+    .search-bar:focus { border-color: rgba(245,197,24,0.5); }
     .status-badge { padding: 4px 9px; border-radius: 20px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; white-space: nowrap; }
     .badge-active { background: rgba(34,197,94,0.12); color: #22c55e; border: 1px solid rgba(34,197,94,0.25); }
     .badge-expired { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.25); }
@@ -216,6 +222,11 @@
         </div>
       </div>
 
+      <!-- UPDATE 2 — Search bar tabs se pehle -->
+      <div class="search-container">
+        <input class="search-bar" type="text" id="search-input" placeholder="🔍 Search by Order ID or Name..." oninput="searchTickets(this.value)">
+      </div>
+
       <!-- Tabs -->
       <div class="tabs-container">
         <div class="tabs">
@@ -298,7 +309,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJ-RcKNMpkPCPw0cuvpcC4uX-c4scabAOAm7_RBM28P8lIDaqV4j8b7aDiposJOnTC1Q/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwKeq8mMdxbp6XRy97qRF6jnaM7OpNNv6NcNCODy78TqbJVeFxV2wM17X9dKgzDEd7vCQ/exec";
     const VALID_PINS = ["12345", "123456", "1234567", "12345678", "123456789"];
     const SESSION_HOURS = 6;
 
@@ -377,24 +388,46 @@
       renderTickets(inScanner);
     }
 
+    // UPDATE 3 — renderTickets + search functions
+    function formatDate(isoString) {
+      if (!isoString) return '';
+      try {
+        const d = new Date(isoString);
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' · ' +
+               d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+      } catch(e) { return ''; }
+    }
+
+    function searchTickets(query) {
+      const q = query.toLowerCase().trim();
+      const filtered = allTickets.filter(t =>
+        (t.order_id || '').toLowerCase().includes(q) ||
+        (t.name || '').toLowerCase().includes(q)
+      );
+      renderTicketsList(filtered, 'tickets-list');
+    }
+
     function renderTickets(inScanner) {
       let filtered = allTickets;
       if (currentTab === 'active') filtered = allTickets.filter(t => t.status === 'Active');
       if (currentTab === 'used') filtered = allTickets.filter(t => t.status !== 'Active');
+      const listId = inScanner ? 'scanner-tickets-list' : 'tickets-list';
+      renderTicketsList(filtered, listId);
+    }
 
-      const html = filtered.length > 0 ? filtered.map(t => `
+    function renderTicketsList(tickets, listId) {
+      const html = tickets.length > 0 ? tickets.map(t => `
         <div class="ticket-item">
           <div class="ticket-info">
             <div class="ticket-name">${t.name || 'Unknown'}</div>
             <div class="ticket-email">${t.email || ''}</div>
+            <div class="ticket-date">📅 ${formatDate(t.created_at)} · #${t.order_id || ''}</div>
           </div>
           <div class="status-badge ${t.status === 'Active' ? 'badge-active' : 'badge-expired'}">
             ${t.status === 'Active' ? '✅ Active' : '❌ Used'}
           </div>
         </div>
       `).join('') : '<div class="empty-state">No tickets found</div>';
-
-      const listId = inScanner ? 'scanner-tickets-list' : 'tickets-list';
       const el = document.getElementById(listId);
       if (el) el.innerHTML = html;
     }

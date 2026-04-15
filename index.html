@@ -29,7 +29,7 @@
     /* Main App */
     .main-app { display: none; flex-direction: column; height: 100%; overflow: hidden; }
 
-    /* Header - Fixed */
+    /* Header */
     .header { background: #0a0a0a; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(245,197,24,0.15); flex-shrink: 0; }
     .header-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
     .header-logo img { width: 34px; height: 34px; object-fit: contain; flex-shrink: 0; }
@@ -43,7 +43,7 @@
     .session-info { font-size: 9px; color: #666; white-space: nowrap; }
     .session-info span { color: #f5c518; }
 
-    /* Stats - Fixed */
+    /* Stats */
     .stats-bar { background: #0d0d0d; padding: 8px 12px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; border-bottom: 1px solid rgba(245,197,24,0.08); flex-shrink: 0; }
     .stat-card { background: #111; border: 1px solid rgba(245,197,24,0.08); border-radius: 10px; padding: 8px 4px; text-align: center; }
     .stat-number { font-size: 20px; font-weight: 900; line-height: 1.1; }
@@ -57,15 +57,57 @@
     .scroll-content { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
 
     /* Ready Screen */
-    .scanner-ready { padding: 20px 16px; display: flex; flex-direction: column; align-items: center; }
-    .ready-card { background: #111; border: 1px solid rgba(245,197,24,0.1); border-radius: 18px; padding: 30px 20px; text-align: center; width: 100%; max-width: 400px; }
-    .ready-icon { font-size: 50px; margin-bottom: 12px; }
-    .ready-title { font-size: 18px; font-weight: 800; color: white; margin-bottom: 8px; }
-    .ready-sub { font-size: 12px; color: #666; margin-bottom: 25px; line-height: 1.6; }
-    .scan-btn { background: #f5c518; color: #0a0a0a; border: none; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 900; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 2px; }
-    .scan-btn:active { background: #d4a800; transform: scale(0.98); }
+    .scanner-ready { padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .ready-card { background: #111; border: 1px solid rgba(245,197,24,0.1); border-radius: 18px; padding: 25px 20px; text-align: center; width: 100%; max-width: 400px; }
+    .ready-icon { font-size: 45px; margin-bottom: 10px; }
+    .ready-title { font-size: 17px; font-weight: 800; color: white; margin-bottom: 6px; }
+    .ready-sub { font-size: 12px; color: #666; margin-bottom: 20px; line-height: 1.5; }
+    .scan-btn { background: #f5c518; color: #0a0a0a; border: none; padding: 15px; border-radius: 14px; font-size: 15px; font-weight: 900; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 2px; }
+    .scan-btn:active { background: #d4a800; }
+    .manual-btn { background: #1a1a1a; color: #f5c518; border: 1px solid rgba(245,197,24,0.3); padding: 13px; border-radius: 14px; font-size: 14px; font-weight: 800; cursor: pointer; width: 100%; max-width: 400px; text-transform: uppercase; letter-spacing: 1px; }
+    .manual-btn:active { background: #222; }
 
-    /* Scanner Screen - Fixed camera, scroll below */
+    /* Manual Search Screen */
+    .manual-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #0a0a0a; z-index: 500; display: none; flex-direction: column; }
+    .manual-screen.show { display: flex; }
+    .manual-header { background: #111; padding: 14px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(245,197,24,0.15); flex-shrink: 0; }
+    .back-btn { background: none; border: none; color: #f5c518; font-size: 20px; cursor: pointer; padding: 4px; }
+    .manual-header-title { font-size: 15px; font-weight: 800; color: #f5c518; text-transform: uppercase; letter-spacing: 1px; }
+    .manual-search-wrap { padding: 16px; flex-shrink: 0; }
+    .manual-search-input { width: 100%; background: #111; border: 2px solid rgba(245,197,24,0.3); border-radius: 14px; padding: 14px 16px; font-size: 15px; color: white; outline: none; }
+    .manual-search-input::placeholder { color: #555; }
+    .manual-search-input:focus { border-color: #f5c518; }
+    .manual-results { flex: 1; overflow-y: auto; padding: 0 16px 20px; -webkit-overflow-scrolling: touch; }
+    .manual-result-item { background: #111; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px 16px; margin-bottom: 8px; cursor: pointer; transition: all 0.15s; }
+    .manual-result-item:active { background: #1a1a1a; border-color: rgba(245,197,24,0.3); }
+    .mri-name { font-size: 14px; font-weight: 700; color: white; }
+    .mri-email { font-size: 11px; color: #888; margin-top: 2px; }
+    .mri-meta { font-size: 10px; color: #555; margin-top: 3px; }
+    .mri-badge { display: inline-block; padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 800; margin-top: 4px; text-transform: uppercase; }
+    .mri-active { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+    .mri-expired { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+    .manual-empty { text-align: center; color: #555; padding: 40px 20px; font-size: 13px; }
+
+    /* Ticket Detail Screen */
+    .detail-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #0a0a0a; z-index: 600; display: none; flex-direction: column; }
+    .detail-screen.show { display: flex; }
+    .detail-header { background: #111; padding: 14px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(245,197,24,0.15); flex-shrink: 0; }
+    .detail-header-title { font-size: 15px; font-weight: 800; color: #f5c518; text-transform: uppercase; letter-spacing: 1px; }
+    .detail-body { flex: 1; overflow-y: auto; padding: 20px 16px; -webkit-overflow-scrolling: touch; }
+    .detail-card { background: #111; border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+    .detail-field { margin-bottom: 14px; }
+    .detail-field:last-child { margin-bottom: 0; }
+    .detail-label { font-size: 9px; color: #666; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
+    .detail-value { font-size: 16px; font-weight: 700; color: white; }
+    .detail-status-active { color: #22c55e; }
+    .detail-status-expired { color: #ef4444; }
+    .detail-date { font-size: 12px; color: #888; }
+    .entry-btn { background: #22c55e; color: white; border: none; padding: 18px; border-radius: 16px; font-size: 16px; font-weight: 900; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+    .entry-btn:active { background: #1aad50; }
+    .entry-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+    .already-used-msg { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 14px; text-align: center; color: #ef4444; font-size: 13px; font-weight: 700; }
+
+    /* Scanner Screen */
     .scanner-screen { display: none; flex-direction: column; height: 100%; overflow: hidden; }
     .scanner-fixed { flex-shrink: 0; padding: 12px 16px 8px; }
     .scanner-title { font-size: 10px; color: #666; margin-bottom: 10px; text-align: center; text-transform: uppercase; letter-spacing: 2px; }
@@ -86,12 +128,18 @@
     .scanner-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
     /* Tabs */
-    .tabs-container { padding: 12px 14px 0; flex-shrink: 0; }
+    .tabs-container { padding: 12px 14px 0; }
     .tabs { display: flex; gap: 6px; background: #111; border-radius: 12px; padding: 4px; }
     .tab { flex: 1; padding: 8px 4px; border-radius: 9px; font-size: 11px; font-weight: 700; text-align: center; cursor: pointer; transition: all 0.2s; color: #666; user-select: none; }
     .tab.active { background: #f5c518; color: #0a0a0a; }
     .tab-count { font-size: 14px; font-weight: 900; display: block; line-height: 1.2; }
     .tab-label { font-size: 9px; letter-spacing: 0.5px; text-transform: uppercase; }
+
+    /* Search Bar in Dashboard */
+    .search-container { padding: 10px 14px 0; }
+    .search-bar { width: 100%; background: #111; border: 1px solid rgba(245,197,24,0.2); border-radius: 12px; padding: 10px 14px; font-size: 13px; color: white; outline: none; }
+    .search-bar::placeholder { color: #555; }
+    .search-bar:focus { border-color: rgba(245,197,24,0.5); }
 
     /* Ticket List */
     .tickets-list { padding: 10px 14px 20px; }
@@ -99,19 +147,14 @@
     .ticket-info { min-width: 0; flex: 1; }
     .ticket-name { font-size: 13px; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .ticket-email { font-size: 10px; color: #666; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    /* UPDATE 1 — ticket-date + search styles */
     .ticket-date { font-size: 9px; color: #555; margin-top: 2px; }
-    .search-container { padding: 10px 14px 0; }
-    .search-bar { width: 100%; background: #111; border: 1px solid rgba(245,197,24,0.2); border-radius: 12px; padding: 10px 14px; font-size: 13px; color: white; outline: none; }
-    .search-bar::placeholder { color: #555; }
-    .search-bar:focus { border-color: rgba(245,197,24,0.5); }
     .status-badge { padding: 4px 9px; border-radius: 20px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; white-space: nowrap; }
     .badge-active { background: rgba(34,197,94,0.12); color: #22c55e; border: 1px solid rgba(34,197,94,0.25); }
     .badge-expired { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.25); }
     .empty-state { text-align: center; color: #555; padding: 30px; font-size: 12px; }
 
     /* Footer */
-    .footer { text-align: center; padding: 14px; border-top: 1px solid rgba(255,255,255,0.04); flex-shrink: 0; }
+    .footer { text-align: center; padding: 14px; border-top: 1px solid rgba(255,255,255,0.04); }
     .footer p { font-size: 10px; color: #444; letter-spacing: 0.5px; }
     .footer span { color: #f5c518; }
 
@@ -172,7 +215,6 @@
   <!-- Main App -->
   <div class="main-app" id="main-app">
 
-    <!-- Fixed Header -->
     <div class="header">
       <div class="header-left">
         <div class="header-logo">
@@ -189,7 +231,6 @@
       </div>
     </div>
 
-    <!-- Fixed Stats -->
     <div class="stats-bar">
       <div class="stat-card stat-total">
         <div class="stat-number" id="total-count">0</div>
@@ -209,25 +250,22 @@
       </div>
     </div>
 
-    <!-- Scrollable Content — Dashboard -->
+    <!-- Dashboard -->
     <div class="scroll-content" id="dashboard-screen">
-
-      <!-- Ready to Scan -->
-      <div class="scanner-ready" id="scanner-ready">
+      <div class="scanner-ready">
         <div class="ready-card">
           <div class="ready-icon">🎟️</div>
           <div class="ready-title">Ready to Scan</div>
-          <div class="ready-sub">Tap the button below to activate camera and start scanning tickets</div>
+          <div class="ready-sub">Activate camera to scan QR codes at the gate</div>
           <button class="scan-btn" onclick="activateScanner()">📷 Start Scanning</button>
         </div>
+        <button class="manual-btn" onclick="openManualSearch()">🔍 Manual Search Entry</button>
       </div>
 
-      <!-- UPDATE 2 — Search bar tabs se pehle -->
       <div class="search-container">
         <input class="search-bar" type="text" id="search-input" placeholder="🔍 Search by Order ID or Name..." oninput="searchTickets(this.value)">
       </div>
 
-      <!-- Tabs -->
       <div class="tabs-container">
         <div class="tabs">
           <div class="tab active" id="tab-all" onclick="switchTab('all')">
@@ -244,9 +282,7 @@
           </div>
         </div>
       </div>
-
       <div class="tickets-list" id="tickets-list"></div>
-
       <div class="footer">
         <p>© 2026 <span>Komrad Promotions</span> · Powered by <span>Carpediem</span></p>
       </div>
@@ -254,8 +290,6 @@
 
     <!-- Scanner Screen -->
     <div class="scanner-screen" id="scanner-screen">
-
-      <!-- Fixed Camera -->
       <div class="scanner-fixed">
         <div class="scanner-title">Point camera at customer QR code</div>
         <div id="video-container">
@@ -274,8 +308,6 @@
         <div id="status">Initializing camera...</div>
         <button class="stop-btn" onclick="deactivateScanner()">✕ Stop Scanner</button>
       </div>
-
-      <!-- Scrollable Tickets Below Camera -->
       <div class="scanner-scroll">
         <div class="tabs-container">
           <div class="tabs">
@@ -299,7 +331,29 @@
         </div>
       </div>
     </div>
+  </div>
 
+  <!-- Manual Search Screen -->
+  <div class="manual-screen" id="manual-screen">
+    <div class="manual-header">
+      <button class="back-btn" onclick="closeManualSearch()">←</button>
+      <div class="manual-header-title">🔍 Manual Entry Search</div>
+    </div>
+    <div class="manual-search-wrap">
+      <input class="manual-search-input" type="text" id="manual-input" placeholder="Type name or order ID..." oninput="filterManual(this.value)" autofocus>
+    </div>
+    <div class="manual-results" id="manual-results">
+      <div class="manual-empty">Start typing to search tickets...</div>
+    </div>
+  </div>
+
+  <!-- Ticket Detail Screen -->
+  <div class="detail-screen" id="detail-screen">
+    <div class="detail-header">
+      <button class="back-btn" onclick="closeDetail()">←</button>
+      <div class="detail-header-title">🎟️ Ticket Details</div>
+    </div>
+    <div class="detail-body" id="detail-body"></div>
   </div>
 
   <!-- Popup -->
@@ -318,6 +372,7 @@
     let allTickets = [];
     let currentTab = 'all';
     let scannerActive = false;
+    let selectedTicket = null;
 
     // PIN
     function addPin(num) {
@@ -377,7 +432,112 @@
       document.getElementById('local-time').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
     }
 
-    // Tabs
+    // Manual Search
+    function openManualSearch() {
+      document.getElementById('manual-screen').classList.add('show');
+      document.getElementById('manual-input').value = '';
+      document.getElementById('manual-results').innerHTML = '<div class="manual-empty">Start typing to search tickets...</div>';
+      setTimeout(() => document.getElementById('manual-input').focus(), 300);
+    }
+    function closeManualSearch() {
+      document.getElementById('manual-screen').classList.remove('show');
+    }
+    function filterManual(query) {
+      const q = query.toLowerCase().trim();
+      if (!q) {
+        document.getElementById('manual-results').innerHTML = '<div class="manual-empty">Start typing to search tickets...</div>';
+        return;
+      }
+      const filtered = allTickets.filter(t =>
+        (t.order_id || '').toLowerCase().includes(q) ||
+        (t.name || '').toLowerCase().includes(q)
+      );
+      if (filtered.length === 0) {
+        document.getElementById('manual-results').innerHTML = '<div class="manual-empty">No tickets found</div>';
+        return;
+      }
+      document.getElementById('manual-results').innerHTML = filtered.map((t, i) => `
+        <div class="manual-result-item" onclick="openDetail(${allTickets.indexOf(t)})">
+          <div class="mri-name">${t.name || 'Unknown'}</div>
+          <div class="mri-email">${t.email || ''}</div>
+          <div class="mri-meta">#${t.order_id || ''} · ${formatDate(t.created_at)}</div>
+          <span class="mri-badge ${t.status === 'Active' ? 'mri-active' : 'mri-expired'}">
+            ${t.status === 'Active' ? '✅ Active' : '❌ Used'}
+          </span>
+        </div>
+      `).join('');
+    }
+
+    // Ticket Detail
+    function openDetail(index) {
+      selectedTicket = allTickets[index];
+      if (!selectedTicket) return;
+      closeManualSearch();
+      const t = selectedTicket;
+      const isActive = t.status === 'Active';
+      document.getElementById('detail-body').innerHTML = `
+        <div class="detail-card">
+          <div class="detail-field">
+            <div class="detail-label">Name</div>
+            <div class="detail-value">${t.name || 'Unknown'}</div>
+          </div>
+          <div class="detail-field">
+            <div class="detail-label">Email</div>
+            <div class="detail-value" style="font-size:14px;">${t.email || ''}</div>
+          </div>
+          <div class="detail-field">
+            <div class="detail-label">Order ID</div>
+            <div class="detail-value" style="font-size:14px;">${t.order_id || ''}</div>
+          </div>
+          <div class="detail-field">
+            <div class="detail-label">Created</div>
+            <div class="detail-date">${formatDate(t.created_at)}</div>
+          </div>
+          <div class="detail-field">
+            <div class="detail-label">Status</div>
+            <div class="detail-value ${isActive ? 'detail-status-active' : 'detail-status-expired'}">
+              ${isActive ? '✅ Active' : '❌ Already Used'}
+            </div>
+          </div>
+        </div>
+        ${isActive ? `
+          <button class="entry-btn" onclick="markManualEntry()">✅ Approve Entry & Expire Ticket</button>
+        ` : `
+          <div class="already-used-msg">❌ This ticket has already been used for entry</div>
+        `}
+      `;
+      document.getElementById('detail-screen').classList.add('show');
+    }
+
+    function closeDetail() {
+      document.getElementById('detail-screen').classList.remove('show');
+      selectedTicket = null;
+    }
+
+    function markManualEntry() {
+      if (!selectedTicket) return;
+      const token = selectedTicket.scan_link ? new URL(selectedTicket.scan_link).searchParams.get('token') : null;
+      if (!token) {
+        alert('Token not found. Cannot process entry.');
+        return;
+      }
+      fetch(SCRIPT_URL + '?action=scanresult&token=' + encodeURIComponent(token))
+        .then(r => r.json())
+        .then(data => {
+          closeDetail();
+          if (data.status === 'approved') {
+            showPopup('approved', '✅', 'Entry Approved!', data.name, data.email, data.order_id);
+          } else if (data.status === 'expired') {
+            showPopup('expired', '❌', 'Ticket Expired!', data.name, data.email, data.order_id);
+          } else {
+            showPopup('notfound', '⚠️', 'Ticket Not Found', '', '', '');
+          }
+          loadStats();
+        })
+        .catch(() => alert('Connection error. Please try again.'));
+    }
+
+    // Tabs & Tickets
     function switchTab(tab, inScanner) {
       currentTab = tab;
       const prefix = inScanner ? 'stab' : 'tab';
@@ -388,7 +548,6 @@
       renderTickets(inScanner);
     }
 
-    // UPDATE 3 — renderTickets + search functions
     function formatDate(isoString) {
       if (!isoString) return '';
       try {
@@ -400,10 +559,10 @@
 
     function searchTickets(query) {
       const q = query.toLowerCase().trim();
-      const filtered = allTickets.filter(t =>
+      const filtered = q ? allTickets.filter(t =>
         (t.order_id || '').toLowerCase().includes(q) ||
         (t.name || '').toLowerCase().includes(q)
-      );
+      ) : allTickets;
       renderTicketsList(filtered, 'tickets-list');
     }
 
@@ -411,12 +570,13 @@
       let filtered = allTickets;
       if (currentTab === 'active') filtered = allTickets.filter(t => t.status === 'Active');
       if (currentTab === 'used') filtered = allTickets.filter(t => t.status !== 'Active');
-      const listId = inScanner ? 'scanner-tickets-list' : 'tickets-list';
-      renderTicketsList(filtered, listId);
+      renderTicketsList(filtered, inScanner ? 'scanner-tickets-list' : 'tickets-list');
     }
 
     function renderTicketsList(tickets, listId) {
-      const html = tickets.length > 0 ? tickets.map(t => `
+      const el = document.getElementById(listId);
+      if (!el) return;
+      el.innerHTML = tickets.length > 0 ? tickets.map(t => `
         <div class="ticket-item">
           <div class="ticket-info">
             <div class="ticket-name">${t.name || 'Unknown'}</div>
@@ -428,11 +588,9 @@
           </div>
         </div>
       `).join('') : '<div class="empty-state">No tickets found</div>';
-      const el = document.getElementById(listId);
-      if (el) el.innerHTML = html;
     }
 
-    // Scanner
+    // Camera Scanner
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
@@ -515,14 +673,14 @@
         ${email ? `<div class="popup-detail"><div class="popup-label">Email</div><div class="popup-value">${email}</div></div>` : ''}
         ${orderId ? `<div class="popup-detail"><div class="popup-label">Order ID</div><div class="popup-value">${orderId}</div></div>` : ''}
         <div class="popup-badge">${badge}</div><br>
-        <button class="next-btn" onclick="nextScan()">🔄 Scan Next Ticket</button>
+        <button class="next-btn" onclick="nextScan()">🔄 Done</button>
       `;
       document.getElementById('popup-overlay').classList.add('show');
     }
 
     function nextScan() {
       document.getElementById('popup-overlay').classList.remove('show');
-      startCamera();
+      if (scannerActive) startCamera();
     }
 
     // Stats
@@ -534,12 +692,9 @@
           const active = data.active || 0;
           const expired = data.expired || 0;
           allTickets = data.tickets || [];
-
           document.getElementById('total-count').textContent = total;
           document.getElementById('active-count').textContent = active;
           document.getElementById('expired-count').textContent = expired;
-
-          // Tab counts
           ['tab','stab'].forEach(p => {
             const a = document.getElementById(p + '-all-count');
             const ac = document.getElementById(p + '-active-count');
@@ -548,7 +703,6 @@
             if (ac) ac.textContent = active;
             if (u) u.textContent = expired;
           });
-
           renderTickets(scannerActive);
         }).catch(() => {});
     }

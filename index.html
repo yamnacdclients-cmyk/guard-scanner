@@ -363,7 +363,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzPDi9yahqLNkFPkQDxTWxKG0KHZX4OIWnsYj2vYqXoeaczIzTQfyb2M7ZAyLnBSUWh/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby79vaJmF338w-nWkCyd-Cr-s4pX0PLvlY1Q_RhpyH--vjVyEvhZkmYt5BvPtbGYLSkXA/exec";
     const VALID_PINS = ["12345", "123456", "1234567", "12345678", "123456789"];
     const SESSION_HOURS = 6;
 
@@ -490,6 +490,10 @@
             <div class="detail-value" style="font-size:14px;">${t.order_id || ''}</div>
           </div>
           <div class="detail-field">
+            <div class="detail-label">Ticket Type</div>
+            <div class="detail-value" style="font-size:14px; color:#f5c518;">${t.product_name || 'General Admission'}</div>
+          </div>
+          <div class="detail-field">
             <div class="detail-label">Created</div>
             <div class="detail-date">${formatDate(t.created_at)}</div>
           </div>
@@ -526,11 +530,11 @@
         .then(data => {
           closeDetail();
           if (data.status === 'approved') {
-            showPopup('approved', '✅', 'Entry Approved!', data.name, data.email, data.order_id);
+            showPopup('approved', '✅', 'Entry Approved!', data.name, data.email, data.order_id, data.product_name);
           } else if (data.status === 'expired') {
-            showPopup('expired', '❌', 'Ticket Expired!', data.name, data.email, data.order_id);
+            showPopup('expired', '❌', 'Ticket Expired!', data.name, data.email, data.order_id, data.product_name);
           } else {
-            showPopup('notfound', '⚠️', 'Ticket Not Found', '', '', '');
+            showPopup('notfound', '⚠️', 'Ticket Not Found', '', '', '', '');
           }
           loadStats();
         })
@@ -573,6 +577,7 @@
       renderTicketsList(filtered, inScanner ? 'scanner-tickets-list' : 'tickets-list');
     }
 
+    // ✅ UPDATE 1: ticket list me product_name dikhao
     function renderTicketsList(tickets, listId) {
       const el = document.getElementById(listId);
       if (!el) return;
@@ -581,7 +586,7 @@
           <div class="ticket-info">
             <div class="ticket-name">${t.name || 'Unknown'}</div>
             <div class="ticket-email">${t.email || ''}</div>
-            <div class="ticket-date">📅 ${formatDate(t.created_at)} · #${t.order_id || ''}</div>
+            <div class="ticket-date">🎫 ${t.product_name || 'General Admission'} · 📅 ${formatDate(t.created_at)}</div>
           </div>
           <div class="status-badge ${t.status === 'Active' ? 'badge-active' : 'badge-expired'}">
             ${t.status === 'Active' ? '✅ Active' : '❌ Used'}
@@ -645,22 +650,24 @@
       try {
         const urlObj = new URL(url);
         const token = urlObj.searchParams.get('token');
-        if (!token) { showPopup('notfound', '⚠️', 'Invalid QR Code', '', '', ''); return; }
+        if (!token) { showPopup('notfound', '⚠️', 'Invalid QR Code', '', '', '', ''); return; }
         fetch(SCRIPT_URL + '?action=scanresult&token=' + encodeURIComponent(token))
           .then(r => r.json())
           .then(data => {
-            if (data.status === 'approved') showPopup('approved', '✅', 'Entry Approved!', data.name, data.email, data.order_id);
-            else if (data.status === 'expired') showPopup('expired', '❌', 'Ticket Expired!', data.name, data.email, data.order_id);
-            else showPopup('notfound', '⚠️', 'Ticket Not Found', '', '', '');
+            // ✅ UPDATE 3: product_name pass karo showPopup me
+            if (data.status === 'approved') showPopup('approved', '✅', 'Entry Approved!', data.name, data.email, data.order_id, data.product_name);
+            else if (data.status === 'expired') showPopup('expired', '❌', 'Ticket Expired!', data.name, data.email, data.order_id, data.product_name);
+            else showPopup('notfound', '⚠️', 'Ticket Not Found', '', '', '', '');
             loadStats();
           })
-          .catch(() => showPopup('notfound', '⚠️', 'Connection Error', '', '', ''));
+          .catch(() => showPopup('notfound', '⚠️', 'Connection Error', '', '', '', ''));
       } catch(e) {
-        showPopup('notfound', '⚠️', 'Invalid QR Code', '', '', '');
+        showPopup('notfound', '⚠️', 'Invalid QR Code', '', '', '', '');
       }
     }
 
-    function showPopup(type, icon, title, name, email, orderId) {
+    // ✅ UPDATE 3: showPopup me productName parameter add kiya
+    function showPopup(type, icon, title, name, email, orderId, productName) {
       if (stream) stream.getTracks().forEach(t => t.stop());
       scanning = false;
       const badge = type === 'approved' ? '✓ CHECKED IN' : type === 'expired' ? '✗ ALREADY USED' : '⚠ NOT FOUND';
@@ -672,6 +679,7 @@
         ${name ? `<div class="popup-detail"><div class="popup-label">Name</div><div class="popup-value">${name}</div></div>` : ''}
         ${email ? `<div class="popup-detail"><div class="popup-label">Email</div><div class="popup-value">${email}</div></div>` : ''}
         ${orderId ? `<div class="popup-detail"><div class="popup-label">Order ID</div><div class="popup-value">${orderId}</div></div>` : ''}
+        ${productName ? `<div class="popup-detail"><div class="popup-label">Ticket Type</div><div class="popup-value" style="color:#f5c518;">${productName}</div></div>` : ''}
         <div class="popup-badge">${badge}</div><br>
         <button class="next-btn" onclick="nextScan()">🔄 Done</button>
       `;

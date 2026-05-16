@@ -183,29 +183,25 @@ async function loadOrder() {
   const orderId = "ORD-" + digits;
 
   try {
-    const data = await jsonp(SCRIPT_URL + "?action=stats");
-    const allTickets = data.tickets || [];
-    const matchedOrderTickets = allTickets.filter(t => {
-      const orderOk = t.order_id === orderId;
-      const emailOk = !emailParam || String(t.email || "").toLowerCase() === emailParam;
-      return orderOk && emailOk;
-    });
+    const data = await jsonp(
+      SCRIPT_URL +
+      "?action=order_tickets&order_id=" + encodeURIComponent(orderId) +
+      (emailParam ? "&email=" + encodeURIComponent(emailParam) : "")
+    );
+    const tickets = data.tickets || [];
 
-    if (!matchedOrderTickets.length) {
+    if (!tickets.length) {
       error.textContent = "No tickets found for this order.";
       return;
     }
 
-    const customerEmails = Array.from(new Set(matchedOrderTickets
+    const customerEmails = Array.from(new Set(tickets
       .map(t => String(t.email || "").toLowerCase().trim())
       .filter(Boolean)));
-    const tickets = customerEmails.length
-      ? allTickets.filter(t => customerEmails.includes(String(t.email || "").toLowerCase().trim()))
-      : matchedOrderTickets;
 
     document.getElementById("form").classList.add("hidden");
     ticketsBox.classList.remove("hidden");
-    ticketsBox.innerHTML = ticketResultsHtml(orderId, tickets, customerEmails[0] || "");
+    ticketsBox.innerHTML = ticketResultsHtml(orderId, tickets, data.email || customerEmails[0] || "");
   } catch (e) {
     error.textContent = "Could not load tickets. Please try again.";
   } finally {

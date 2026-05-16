@@ -184,20 +184,28 @@ async function loadOrder() {
 
   try {
     const data = await jsonp(SCRIPT_URL + "?action=stats");
-    const tickets = (data.tickets || []).filter(t => {
+    const allTickets = data.tickets || [];
+    const matchedOrderTickets = allTickets.filter(t => {
       const orderOk = t.order_id === orderId;
       const emailOk = !emailParam || String(t.email || "").toLowerCase() === emailParam;
       return orderOk && emailOk;
     });
 
-    if (!tickets.length) {
+    if (!matchedOrderTickets.length) {
       error.textContent = "No tickets found for this order.";
       return;
     }
 
+    const customerEmails = Array.from(new Set(matchedOrderTickets
+      .map(t => String(t.email || "").toLowerCase().trim())
+      .filter(Boolean)));
+    const tickets = customerEmails.length
+      ? allTickets.filter(t => customerEmails.includes(String(t.email || "").toLowerCase().trim()))
+      : matchedOrderTickets;
+
     document.getElementById("form").classList.add("hidden");
     ticketsBox.classList.remove("hidden");
-    ticketsBox.innerHTML = ticketResultsHtml(orderId, tickets);
+    ticketsBox.innerHTML = ticketResultsHtml(orderId, tickets, customerEmails[0] || "");
   } catch (e) {
     error.textContent = "Could not load tickets. Please try again.";
   } finally {
@@ -206,13 +214,13 @@ async function loadOrder() {
   }
 }
 
-function ticketResultsHtml(orderId, tickets) {
+function ticketResultsHtml(orderId, tickets, customerEmail) {
   const countText = tickets.length === 1 ? "1 ticket ready" : tickets.length + " tickets ready";
   return `
     <div class="resultHead">
-      <span class="orderLabel">Confirmed order</span>
+      <span class="orderLabel">Customer tickets</span>
       <div class="orderTitle">${escapeHtml(orderId)}</div>
-      <p>${escapeHtml(countText)}. Show each QR code at the entrance.</p>
+      <p>${escapeHtml(countText)}${customerEmail ? " for " + escapeHtml(customerEmail) : ""}. Show each QR code at the entrance.</p>
     </div>
     <div class="ticketStack">${tickets.map(ticketHtml).join("")}</div>
     <button class="backBtn" onclick="resetView()">CHECK ANOTHER ORDER</button>
@@ -232,6 +240,7 @@ function ticketHtml(t, index) {
         <div class="badge ${active ? "active" : "used"}">${active ? "ACTIVE" : "USED"}</div>
       </div>
       <div class="meta">
+        <div><strong>Order ID</strong>${escapeHtml(t.order_id || "-")}</div>
         <div><strong>Email</strong>${escapeHtml(t.email || "-")}</div>
         <div><strong>Ticket ID</strong>${escapeHtml(t.ticket_id || "-")}</div>
         <div><strong>Ticket Type</strong>${escapeHtml(t.product_name || "Event Ticket")}</div>

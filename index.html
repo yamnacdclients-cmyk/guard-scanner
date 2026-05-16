@@ -2,99 +2,104 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Komrad Customer Tickets</title>
   <style>
     *{box-sizing:border-box}
-    body{margin:0;min-height:100vh;background:#f4f6fb;font-family:Arial,sans-serif;color:#101828;overflow-x:hidden}
-    .bg-bubbles{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:linear-gradient(135deg,#f7f9ff 0%,#eef3fb 52%,#f9fbff 100%)}
-    .bg-bubbles span{position:absolute;display:block;width:140px;height:140px;border-radius:50%;background:rgba(245,197,24,.16);box-shadow:0 18px 70px rgba(16,24,40,.08);animation:floatBubble 18s linear infinite;bottom:-180px}
-    .bg-bubbles span:nth-child(1){left:8%;width:96px;height:96px;animation-duration:16s;animation-delay:0s}
-    .bg-bubbles span:nth-child(2){left:24%;width:150px;height:150px;animation-duration:22s;animation-delay:2s;background:rgba(18,183,106,.12)}
-    .bg-bubbles span:nth-child(3){left:48%;width:82px;height:82px;animation-duration:15s;animation-delay:4s;background:rgba(52,64,84,.10)}
-    .bg-bubbles span:nth-child(4){left:70%;width:190px;height:190px;animation-duration:25s;animation-delay:1s}
-    .bg-bubbles span:nth-child(5){left:86%;width:116px;height:116px;animation-duration:18s;animation-delay:6s;background:rgba(18,183,106,.10)}
-    @keyframes floatBubble{0%{transform:translateY(0) scale(.86);opacity:0}12%{opacity:1}100%{transform:translateY(-120vh) scale(1.16);opacity:0}}
-    .page{position:relative;z-index:1;min-height:100vh;padding:34px 18px;display:flex;align-items:center;justify-content:center}
-    .wrap{width:100%;max-width:860px;background:rgba(255,255,255,.9);border:1px solid #d0d5dd;border-radius:30px;overflow:hidden;box-shadow:0 28px 80px rgba(16,24,40,.12);backdrop-filter:blur(14px)}
-    .hero{padding:30px 28px 28px;text-align:center;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(248,250,252,.94));border-bottom:1px solid #e4e7ec}
-    .brand{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:26px}
-    .brand img{width:62px;height:62px;border-radius:16px;object-fit:cover;box-shadow:0 10px 28px rgba(16,24,40,.08)}
-    .brand b{display:block;color:#f5c518;font-size:20px;letter-spacing:0;font-weight:900}
-    h1{margin:0;color:#5f6f89;font-size:32px;line-height:1.1;font-weight:900;letter-spacing:0;text-transform:uppercase;white-space:nowrap}
-    .body{padding:30px 22px 36px}
-    .formCard{max-width:430px;margin:0 auto}
-    label{display:block;text-align:center;font-weight:900;margin-bottom:14px;font-size:16px;color:#07182f}
-    .input{display:flex;align-items:center;gap:10px;border:1px solid #cbd5e1;background:#f8fafc;border-radius:17px;padding:16px;margin-bottom:16px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9)}
-    .input b{white-space:nowrap;color:#07182f}
-    input{border:0;outline:0;background:transparent;font-size:15px;font-weight:800;width:100%;color:#344054}
-    button{width:100%;border:0;border-radius:17px;background:#f5c518;color:#111827;font-weight:900;font-size:15px;padding:18px;cursor:pointer;box-shadow:0 14px 28px rgba(245,197,24,.24);transition:transform .18s ease,box-shadow .18s ease,opacity .18s ease}
-    button:hover{transform:translateY(-1px);box-shadow:0 18px 34px rgba(245,197,24,.30)}
-    button:disabled{opacity:.7;cursor:not-allowed;transform:none}
-    .hint{font-size:12px;color:#667085;font-weight:700;line-height:1.35;margin:0 0 16px;text-align:left}
-    .error{margin-top:14px;color:#d92d20;font-size:13px;font-weight:800;text-align:center}
-    .resultHead{text-align:center;margin-bottom:22px}
-    .resultHead label{margin-bottom:8px;font-size:18px}
-    .resultHead p{margin:0;color:#667085;font-size:13px;font-weight:800}
-    .ticketGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px;align-items:stretch}
-    .ticket{border:1px solid #d0d5dd;border-radius:22px;padding:18px;background:#fff;box-shadow:0 16px 40px rgba(16,24,40,.08)}
-    .top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px}
-    .name{font-size:18px;font-weight:900;color:#07182f;line-height:1.2;word-break:break-word}
-    .ticketNo{margin-top:5px;color:#667085;font-size:12px;font-weight:900}
+    html{background:#0f172a}
+    body{margin:0;min-height:100vh;font-family:Arial,sans-serif;color:#101828;overflow-x:hidden;background:#0f172a}
+    .bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:
+      radial-gradient(circle at 22% 18%,rgba(245,197,24,.30),transparent 28%),
+      radial-gradient(circle at 82% 8%,rgba(18,183,106,.20),transparent 26%),
+      linear-gradient(180deg,#111827 0%,#172033 34%,#f4f6fb 34%,#eef2f7 100%)}
+    .bg span{position:absolute;border-radius:999px;background:rgba(255,255,255,.14);box-shadow:0 20px 70px rgba(0,0,0,.18);animation:floatBubble 16s linear infinite;bottom:-120px}
+    .bg span:nth-child(1){left:10%;width:74px;height:74px;animation-delay:0s}
+    .bg span:nth-child(2){left:38%;width:112px;height:112px;animation-delay:3s;animation-duration:20s;background:rgba(245,197,24,.16)}
+    .bg span:nth-child(3){left:72%;width:88px;height:88px;animation-delay:1s;background:rgba(18,183,106,.16)}
+    .bg span:nth-child(4){left:88%;width:54px;height:54px;animation-delay:6s;animation-duration:14s}
+    @keyframes floatBubble{0%{transform:translateY(0) scale(.9);opacity:0}15%{opacity:1}100%{transform:translateY(-118vh) scale(1.2);opacity:0}}
+    .app{position:relative;z-index:1;width:100%;max-width:430px;min-height:100vh;margin:0 auto;padding:18px 14px max(22px,env(safe-area-inset-bottom));display:flex;flex-direction:column}
+    .shell{width:100%;min-height:calc(100vh - 40px);display:flex;flex-direction:column;background:rgba(255,255,255,.94);border:1px solid rgba(255,255,255,.65);border-radius:32px;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.28);backdrop-filter:blur(18px)}
+    .hero{position:relative;padding:24px 22px 26px;color:#fff;background:linear-gradient(145deg,#101828 0%,#1b2540 64%,#26324f 100%)}
+    .hero:after{content:"";position:absolute;right:-55px;top:-65px;width:170px;height:170px;border-radius:50%;background:rgba(245,197,24,.18)}
+    .brand{position:relative;z-index:1;display:flex;align-items:center;gap:12px;margin-bottom:28px}
+    .brand img{width:52px;height:52px;border-radius:16px;object-fit:cover;background:#fff;box-shadow:0 12px 28px rgba(0,0,0,.24)}
+    .brand b{display:block;color:#f5c518;font-size:19px;line-height:1;font-weight:900;letter-spacing:0}
+    .brand small{display:block;margin-top:5px;color:#cbd5e1;font-size:11px;font-weight:800;letter-spacing:0;text-transform:uppercase}
+    .titleBlock{position:relative;z-index:1}
+    h1{margin:0;color:#fff;font-size:29px;line-height:1;font-weight:900;letter-spacing:0;text-transform:uppercase;white-space:nowrap}
+    .subtitle{margin:10px 0 0;color:#cbd5e1;font-size:13px;line-height:1.4;font-weight:700}
+    .body{flex:1;padding:22px 18px 24px;background:linear-gradient(180deg,#fff 0%,#f8fafc 100%)}
+    .panel{background:#fff;border:1px solid #e4e7ec;border-radius:24px;padding:18px;box-shadow:0 16px 42px rgba(16,24,40,.08)}
+    label{display:block;font-weight:900;margin-bottom:12px;font-size:16px;color:#07182f}
+    .input{display:flex;align-items:center;gap:10px;border:1px solid #cbd5e1;background:#f8fafc;border-radius:18px;padding:15px 14px;margin-bottom:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9)}
+    .input b{white-space:nowrap;color:#07182f;font-size:14px}
+    input{border:0;outline:0;background:transparent;font-size:17px;font-weight:900;width:100%;color:#344054;letter-spacing:0}
+    .hint{font-size:12px;color:#667085;font-weight:700;line-height:1.4;margin:0 0 16px}
+    button{width:100%;border:0;border-radius:18px;background:#f5c518;color:#101828;font-weight:900;font-size:15px;padding:17px;cursor:pointer;box-shadow:0 16px 30px rgba(245,197,24,.28);transition:transform .16s ease,box-shadow .16s ease,opacity .16s ease}
+    button:active{transform:scale(.99)}
+    button:disabled{opacity:.68;cursor:not-allowed}
+    .error{margin-top:14px;color:#d92d20;font-size:13px;font-weight:900;text-align:center}
+    .resultHead{margin-bottom:16px;background:#101828;color:#fff;border-radius:24px;padding:18px;box-shadow:0 18px 36px rgba(16,24,40,.18)}
+    .orderLabel{display:block;color:#f5c518;font-size:11px;font-weight:900;text-transform:uppercase;margin-bottom:7px}
+    .orderTitle{font-size:19px;font-weight:900;line-height:1.2;word-break:break-word}
+    .resultHead p{margin:10px 0 0;color:#d0d5dd;font-size:12px;font-weight:800;line-height:1.4}
+    .ticketStack{display:grid;gap:16px}
+    .ticket{position:relative;border:1px solid #d7dee8;border-radius:26px;padding:16px;background:#fff;box-shadow:0 18px 44px rgba(16,24,40,.10);overflow:hidden}
+    .ticket:before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:linear-gradient(90deg,#f5c518,#12b76a)}
+    .top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px;padding-top:4px}
+    .name{font-size:19px;font-weight:900;color:#07182f;line-height:1.2;word-break:break-word}
+    .ticketNo{display:inline-flex;margin-top:8px;padding:6px 9px;border-radius:999px;background:#f2f4f7;color:#475467;font-size:11px;font-weight:900}
     .badge{font-size:11px;font-weight:900;border-radius:999px;padding:8px 11px;white-space:nowrap;text-transform:uppercase}
     .active{background:#e9f8f1;color:#12b76a}
     .used{background:#fdecec;color:#d92d20}
-    .meta{display:grid;gap:8px;font-size:12px;color:#475467;line-height:1.35;margin:0 0 16px;font-weight:700}
-    .meta div{padding:9px 10px;background:#f8fafc;border:1px solid #edf2f7;border-radius:12px;word-break:break-word}
+    .meta{display:grid;gap:8px;margin:0 0 15px}
+    .meta div{padding:10px 11px;background:#f8fafc;border:1px solid #edf2f7;border-radius:14px;color:#344054;font-size:12px;line-height:1.35;font-weight:800;word-break:break-word}
     .meta strong{display:block;color:#98a2b3;font-size:10px;text-transform:uppercase;margin-bottom:3px;letter-spacing:0}
-    .qrPanel{background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);border:1px solid #e4e7ec;border-radius:18px;padding:14px;text-align:center}
-    .qrTitle{font-size:12px;font-weight:900;color:#344054;margin-bottom:10px;text-transform:uppercase}
-    .qr{display:block;width:240px;max-width:100%;height:auto;margin:0 auto;border:6px solid #fff;border-radius:14px;box-shadow:0 12px 30px rgba(16,24,40,.14)}
-    .scanNote{margin:10px 0 0;color:#667085;font-size:11px;font-weight:800;line-height:1.35}
+    .qrPanel{background:#f8fafc;border:1px solid #e4e7ec;border-radius:22px;padding:13px;text-align:center}
+    .qrTitle{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;font-weight:900;color:#344054;margin-bottom:11px;text-transform:uppercase}
+    .qrTitle:before{content:"";width:7px;height:7px;border-radius:50%;background:#12b76a;box-shadow:0 0 0 4px rgba(18,183,106,.12)}
+    .qr{display:block;width:252px;max-width:100%;height:auto;margin:0 auto;border:8px solid #fff;border-radius:18px;box-shadow:0 14px 34px rgba(16,24,40,.16)}
+    .scanNote{margin:11px 0 0;color:#667085;font-size:11px;font-weight:800;line-height:1.35}
     .hidden{display:none}
-    .backBtn{margin:22px auto 0;display:block;max-width:210px;background:#101828;color:#fff;box-shadow:0 14px 30px rgba(16,24,40,.18)}
-    @media (max-width:560px){
-      .page{padding:18px 12px;align-items:flex-start}
-      .wrap{border-radius:24px}
-      .hero{padding:24px 16px 22px}
-      .brand{margin-bottom:22px}
-      .brand img{width:54px;height:54px}
-      .brand b{font-size:18px}
-      h1{font-size:26px}
-      .body{padding:26px 16px 30px}
-      .ticketGrid{grid-template-columns:1fr}
-      .qr{width:230px}
-    }
-    @media (max-width:380px){h1{font-size:23px}.brand{gap:10px}.qr{width:210px}}
+    .backBtn{margin:18px 0 0;background:#101828;color:#fff;box-shadow:0 16px 32px rgba(16,24,40,.18)}
+    @media (min-width:431px){.app{padding-top:28px;padding-bottom:28px}.shell{min-height:auto}.body{padding:24px 20px 26px}}
+    @media (max-width:360px){.app{padding-left:10px;padding-right:10px}.shell{border-radius:26px}.hero{padding:22px 18px}.brand img{width:48px;height:48px}h1{font-size:25px}.qr{width:226px}}
   </style>
 </head>
 <body>
-  <div class="bg-bubbles" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
-  <main class="page">
-    <div class="wrap">
-      <div class="hero">
+  <div class="bg" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+  <main class="app">
+    <section class="shell">
+      <header class="hero">
         <div class="brand">
           <img src="https://komradpromotions.com/cdn/shop/files/komrad-logo-C-pv7gGO.png?height=79&v=1770194291" alt="Komrad">
-          <div><b>KOMRAD</b></div>
+          <div>
+            <b>KOMRAD</b>
+            <small>Ticket access</small>
+          </div>
         </div>
-        <h1>CUSTOMER TICKETS</h1>
-      </div>
+        <div class="titleBlock">
+          <h1>CUSTOMER TICKETS</h1>
+          <p class="subtitle">Enter your order number to view your event QR codes.</p>
+        </div>
+      </header>
 
       <div class="body">
-        <div id="form" class="formCard">
-          <label>Enter your order number</label>
+        <div id="form" class="panel">
+          <label>Order number</label>
           <div class="input">
             <b>ORD:</b>
             <input id="order" placeholder="1778260154771" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
           </div>
-          <p class="hint">Example: for ORD-1778260154771, enter 1778260154771 only.</p>
+          <p class="hint">For ORD-1778260154771, enter 1778260154771 only.</p>
           <button id="viewBtn" onclick="loadOrder()">VIEW TICKETS</button>
           <div id="error" class="error"></div>
         </div>
 
         <div id="tickets" class="hidden"></div>
       </div>
-    </div>
+    </section>
   </main>
 
 <script>
@@ -205,10 +210,11 @@ function ticketResultsHtml(orderId, tickets) {
   const countText = tickets.length === 1 ? "1 ticket ready" : tickets.length + " tickets ready";
   return `
     <div class="resultHead">
-      <label>Order ${escapeHtml(orderId)}</label>
-      <p>${escapeHtml(countText)}. Please show each QR code at entry.</p>
+      <span class="orderLabel">Confirmed order</span>
+      <div class="orderTitle">${escapeHtml(orderId)}</div>
+      <p>${escapeHtml(countText)}. Show each QR code at the entrance.</p>
     </div>
-    <div class="ticketGrid">${tickets.map(ticketHtml).join("")}</div>
+    <div class="ticketStack">${tickets.map(ticketHtml).join("")}</div>
     <button class="backBtn" onclick="resetView()">CHECK ANOTHER ORDER</button>
   `;
 }
@@ -233,7 +239,7 @@ function ticketHtml(t, index) {
       <div class="qrPanel">
         <div class="qrTitle">Entry QR Code</div>
         ${t.qr_link ? `<img class="qr" src="${escapeHtml(t.qr_link)}" alt="Ticket QR Code">` : ""}
-        <p class="scanNote">Keep this code visible for the door scanner.</p>
+        <p class="scanNote">Keep brightness high and show this screen to the scanner.</p>
       </div>
     </article>`;
 }

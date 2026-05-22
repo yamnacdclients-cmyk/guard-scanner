@@ -125,10 +125,15 @@
     .active{background:rgba(34,197,94,.13);color:#7ee0a3;border:1px solid rgba(34,197,94,.3)}
     .used{background:rgba(239,68,68,.13);color:#ff8a8a;border:1px solid rgba(239,68,68,.3)}
     .meta{display:none}
-    .qrPanel{background:#fff;border:1px solid rgba(217,165,32,.28);border-radius:8px;padding:12px;text-align:center}
+    .qrPanel{position:relative;overflow:hidden;background:#fff;border:1px solid rgba(217,165,32,.28);border-radius:8px;padding:12px;text-align:center}
     .qrTitle{display:flex;align-items:center;justify-content:center;gap:8px;font-size:10px;font-weight:700;color:#111;margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em}
     .qrTitle:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(217,165,32,.16)}
     .qr{display:block;width:172px;max-width:100%;height:auto;margin:0 auto;border:7px solid #fff;border-radius:6px;box-shadow:0 14px 34px rgba(0,0,0,.16)}
+    .usedQr .qr,.modalQrWrap.usedQr img{filter:grayscale(1) contrast(.82);opacity:.42}
+    .usedStamp{position:absolute;left:50%;top:56%;z-index:3;display:flex;align-items:center;justify-content:center;width:132px;height:132px;border:7px solid rgba(239,34,34,.92);border-radius:50%;color:rgba(239,34,34,.96);font-family:Arial,sans-serif;font-size:31px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;transform:translate(-50%,-50%) rotate(-16deg);pointer-events:none;box-shadow:inset 0 0 0 3px rgba(239,34,34,.92),0 0 0 999px rgba(255,255,255,.08);text-shadow:0 1px 0 rgba(255,255,255,.35)}
+    .usedStamp:before,.usedStamp:after{content:"USED";position:absolute;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:.18em}
+    .usedStamp:before{top:15px}
+    .usedStamp:after{bottom:15px}
     .scanNote{display:none}
     .ticketAction{margin-top:12px;display:block;color:#000;background:var(--gold);border-radius:12px;padding:12px;text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.14em}
     .hidden{display:none}
@@ -144,8 +149,10 @@
     .modalDetails{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
     .modalField{padding:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:6px;color:#fff;font-size:13px;font-weight:700;word-break:break-word}
     .modalField strong{display:block;color:var(--soft);font-size:10px;text-transform:uppercase;margin-bottom:4px;letter-spacing:.08em}
-    .modalQrWrap{position:sticky;top:0;background:#fff;border:1px solid rgba(217,165,32,.28);border-radius:8px;padding:18px;text-align:center}
+    .modalQrWrap{position:sticky;top:0;overflow:hidden;background:#fff;border:1px solid rgba(217,165,32,.28);border-radius:8px;padding:18px;text-align:center}
     .modalQrWrap img{display:block;width:360px;max-width:100%;height:auto;margin:0 auto;border:10px solid #fff;border-radius:6px;box-shadow:0 14px 34px rgba(0,0,0,.16)}
+    .modalQrWrap .usedStamp{width:210px;height:210px;border-width:10px;font-size:52px}
+    .modalQrWrap .usedStamp:before,.modalQrWrap .usedStamp:after{font-size:14px}
     @media (max-width:900px){
       .dashboardGrid{grid-template-columns:1fr}
       .summaryPanel{position:relative;top:auto}
@@ -287,6 +294,13 @@ const orderParam = params.get("order_id") || params.get("orderId") || "";
 const emailParam = (params.get("email") || "").toLowerCase();
 const orderInput = document.getElementById("order");
 let currentTickets = [];
+let currentOrderId = "";
+let currentCustomerEmail = "";
+let currentTicketSignature = "";
+let statusPollTimer = null;
+let isStatusPolling = false;
+let openTicketIndex = null;
+const STATUS_POLL_MS = 5000;
 
 orderInput.addEventListener("input", syncOrderInput);
 orderInput.addEventListener("paste", function() {
@@ -311,6 +325,10 @@ document.addEventListener("click", function(event) {
   if (!help || !help.classList.contains("show")) return;
   if (event.target.closest(".helpWrap")) return;
   help.classList.remove("show");
+});
+
+document.addEventListener("visibilitychange", function() {
+  if (!document.hidden && currentOrderId) refreshOrderStatus(currentOrderId);
 });
 
 function getDigitsOnly(value) {
@@ -361,6 +379,7 @@ async function loadOrder() {
   const error = document.getElementById("error");
   const ticketsBox = document.getElementById("tickets");
   const viewBtn = document.getElementById("viewBtn");
+  stopStatusPolling();
   error.textContent = "";
   ticketsBox.classList.add("hidden");
   ticketsBox.innerHTML = "";
@@ -376,13 +395,11 @@ async function loadOrder() {
   const orderId = "ORD-" + digits;
 
   try {
-    const data = await jsonp(
-      SCRIPT_URL +
-      "?action=order_tickets&order_id=" + encodeURIComponent(orderId) +
-      (emailParam ? "&email=" + encodeURIComponent(emailParam) : "")
-    );
+    const data = await fetchOrderTickets(orderId);
     const tickets = data.tickets || [];
     currentTickets = tickets;
+    currentOrderId = orderId;
+    currentTicketSignature = ticketsSignature(tickets);
 
     if (!tickets.length) {
       error.textContent = "No tickets found for this order.";
@@ -392,16 +409,78 @@ async function loadOrder() {
     const customerEmails = Array.from(new Set(tickets
       .map(t => String(t.email || "").toLowerCase().trim())
       .filter(Boolean)));
+    currentCustomerEmail = data.email || customerEmails[0] || "";
 
     document.getElementById("form").classList.add("hidden");
     ticketsBox.classList.remove("hidden");
-    ticketsBox.innerHTML = ticketResultsHtml(orderId, tickets, data.email || customerEmails[0] || "");
+    ticketsBox.innerHTML = ticketResultsHtml(orderId, tickets, currentCustomerEmail);
+    startStatusPolling(orderId);
   } catch (e) {
     error.textContent = "Could not load tickets. Please try again.";
   } finally {
     viewBtn.textContent = "VIEW TICKETS";
     viewBtn.disabled = false;
   }
+}
+
+function fetchOrderTickets(orderId) {
+  return jsonp(
+    SCRIPT_URL +
+    "?action=order_tickets&order_id=" + encodeURIComponent(orderId) +
+    (emailParam ? "&email=" + encodeURIComponent(emailParam) : "")
+  );
+}
+
+function startStatusPolling(orderId) {
+  stopStatusPolling();
+  statusPollTimer = setInterval(() => refreshOrderStatus(orderId), STATUS_POLL_MS);
+}
+
+function stopStatusPolling() {
+  if (statusPollTimer) clearInterval(statusPollTimer);
+  statusPollTimer = null;
+  isStatusPolling = false;
+}
+
+async function refreshOrderStatus(orderId) {
+  const ticketsBox = document.getElementById("tickets");
+  if (isStatusPolling || ticketsBox.classList.contains("hidden") || document.hidden) return;
+  isStatusPolling = true;
+
+  try {
+    const data = await fetchOrderTickets(orderId);
+    const tickets = data.tickets || [];
+    if (!tickets.length) return;
+
+    const nextSignature = ticketsSignature(tickets);
+    if (nextSignature === currentTicketSignature) return;
+
+    const customerEmails = Array.from(new Set(tickets
+      .map(t => String(t.email || "").toLowerCase().trim())
+      .filter(Boolean)));
+    currentTickets = tickets;
+    currentTicketSignature = nextSignature;
+    currentCustomerEmail = data.email || customerEmails[0] || currentCustomerEmail;
+    ticketsBox.innerHTML = ticketResultsHtml(orderId, tickets, currentCustomerEmail);
+
+    if (openTicketIndex !== null && document.getElementById("ticket-modal").classList.contains("show")) {
+      openTicketModal(openTicketIndex);
+    }
+  } catch (e) {
+    // Keep the current tickets visible if a background status check fails.
+  } finally {
+    isStatusPolling = false;
+  }
+}
+
+function ticketsSignature(tickets) {
+  return JSON.stringify(tickets.map(t => [
+    t.ticket_id || "",
+    t.ticket_num || "",
+    t.quantity || "",
+    String(t.status || "").toLowerCase(),
+    t.qr_link || ""
+  ]));
 }
 
 function ticketResultsHtml(orderId, tickets, customerEmail) {
@@ -467,9 +546,10 @@ function ticketHtml(t, index) {
         <div><strong>Ticket ID</strong>${escapeHtml(t.ticket_id || "-")}</div>
         <div><strong>Ticket Type</strong>${escapeHtml(t.product_name || "Event Ticket")}</div>
       </div>
-      <div class="qrPanel">
+      <div class="qrPanel ${active ? "" : "usedQr"}">
         <div class="qrTitle">Entry QR Code</div>
         ${t.qr_link ? `<img class="qr" src="${escapeHtml(t.qr_link)}" alt="Ticket QR Code">` : ""}
+        ${active ? "" : `<div class="usedStamp" aria-hidden="true">USED</div>`}
         <p class="scanNote">Keep brightness high and show this screen to the scanner.</p>
       </div>
       <div class="ticketAction">Open details</div>
@@ -486,6 +566,7 @@ function ticketCardKeydown(event, index) {
 function openTicketModal(index) {
   const ticket = currentTickets[index];
   if (!ticket) return;
+  openTicketIndex = index;
 
   const active = String(ticket.status || "").toLowerCase() === "active";
   const ticketNumber = ticket.ticket_num ? `Ticket ${escapeHtml(ticket.ticket_num)}${ticket.quantity ? " of " + escapeHtml(ticket.quantity) : ""}` : `Ticket ${index + 1}`;
@@ -500,8 +581,9 @@ function openTicketModal(index) {
       <div class="modalField"><strong>Ticket ID</strong>${escapeHtml(ticket.ticket_id || "-")}</div>
       <div class="modalField"><strong>Ticket Type</strong>${escapeHtml(ticket.product_name || "Event Ticket")}</div>
     </div>
-    <div class="modalQrWrap">
+    <div class="modalQrWrap ${active ? "" : "usedQr"}">
       ${ticket.qr_link ? `<img src="${escapeHtml(ticket.qr_link)}" alt="Ticket QR Code">` : "<div class=\"modalField\"><strong>QR Code</strong>Not available</div>"}
+      ${active ? "" : `<div class="usedStamp" aria-hidden="true">USED</div>`}
     </div>
   `;
   modal.classList.add("show");
@@ -513,14 +595,20 @@ function closeTicketModal(event) {
   const modal = document.getElementById("ticket-modal");
   modal.classList.remove("show");
   modal.setAttribute("aria-hidden", "true");
+  openTicketIndex = null;
 }
 
 function resetView() {
+  stopStatusPolling();
   document.getElementById("tickets").classList.add("hidden");
   document.getElementById("tickets").innerHTML = "";
   document.getElementById("form").classList.remove("hidden");
   document.getElementById("error").textContent = "";
   currentTickets = [];
+  currentOrderId = "";
+  currentCustomerEmail = "";
+  currentTicketSignature = "";
+  openTicketIndex = null;
   closeTicketModal();
   orderInput.focus();
 }

@@ -300,7 +300,7 @@ let currentTicketSignature = "";
 let statusPollTimer = null;
 let isStatusPolling = false;
 let openTicketIndex = null;
-const STATUS_POLL_MS = 1000;
+const STATUS_POLL_MS = 750;
 
 orderInput.addEventListener("input", syncOrderInput);
 orderInput.addEventListener("paste", function() {
@@ -427,12 +427,14 @@ function fetchOrderTickets(orderId) {
   return jsonp(
     SCRIPT_URL +
     "?action=order_tickets&order_id=" + encodeURIComponent(orderId) +
-    (emailParam ? "&email=" + encodeURIComponent(emailParam) : "")
+    (emailParam ? "&email=" + encodeURIComponent(emailParam) : "") +
+    "&_ts=" + Date.now()
   );
 }
 
 function startStatusPolling(orderId) {
   stopStatusPolling();
+  setTimeout(() => refreshOrderStatus(orderId), 250);
   statusPollTimer = setInterval(() => refreshOrderStatus(orderId), STATUS_POLL_MS);
 }
 

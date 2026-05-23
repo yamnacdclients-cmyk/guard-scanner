@@ -184,10 +184,13 @@
       .site-nav a:nth-child(n+3){display:none}
       .site-nav a.active{display:inline}
       .panel{padding:20px}
-      .orderHelp{left:auto;right:-8px;transform:translateY(8px)}
-      .helpWrap:hover .orderHelp,.helpWrap:focus-within .orderHelp,.orderHelp.show{transform:translateY(0)}
-      .orderHelpCard{padding:18px 16px}
-      .orderExample{font-size:17px}
+      .orderHelp{position:fixed;left:50%;right:auto;top:50%;width:calc(100vw - 34px);max-width:360px;transform:translate(-50%,-46%) scale(.98)}
+      .helpWrap:hover .orderHelp,.helpWrap:focus-within .orderHelp,.orderHelp.show{transform:translate(-50%,-50%) scale(1)}
+      .orderHelpCard{padding:20px 16px}
+      .orderHelpCard:before{display:none}
+      .orderHelpCard h3{font-size:17px}
+      .orderHelpCard p{font-size:13px}
+      .orderExample{font-size:17px;overflow-wrap:anywhere}
       .input{padding:15px 12px}
       input{font-size:15px}
       .qr{width:226px}
